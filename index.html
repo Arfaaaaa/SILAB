@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SILAB UIR - Sistem Informasi Laboratorium Universitas Islam Riau</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=2" />
+</head>
+<body class="theme-dark">
+
+<!-- ===== LOGIN LABORAN ===== -->
+<div class="auth-fullscreen-view active-view" id="view-login-admin">
+  <div class="auth-bg-overlay admin-bg-overlay"></div>
+  <div class="auth-wrapper">
+    <div class="auth-glass-card admin-theme-card">
+      <div class="auth-header">
+        <div class="uir-logo-container admin-logo-glow">
+          <img src="logo-uir.png" class="uir-logo-img" alt="Logo UIR" onerror="this.style.display='none'" />
+        </div>
+        <div class="auth-titles">
+          <span class="auth-badge-tag admin-badge">&#128737; PORTAL LABORAN &amp; ADMIN</span>
+          <h1 class="auth-title">UNIVERSITAS ISLAM RIAU</h1>
+          <p class="auth-sub">Sistem Informasi Laboratorium (SILAB) &mdash; Control Center Laboran</p>
+        </div>
+      </div>
+      <form class="auth-form" onsubmit="event.preventDefault(); handleAdminAuth();">
+        <div class="form-field">
+          <label>NIP / Username Laboran</label>
+          <div class="input-with-icon"><span class="field-icon">&#128100;</span>
+          <input type="text" id="adminUser" class="form-control auth-input" placeholder="Username Laboran" value="admin_uir" required /></div>
+        </div>
+        <div class="form-field">
+          <label>Kata Sandi</label>
+          <div class="input-with-icon"><span class="field-icon">&#128274;</span>
+          <input type="password" id="adminPass" class="form-control auth-input" placeholder="Password" value="admin123" required /></div>
+        </div>
+        <div class="form-field">
+          <label>PIN Otorisasi (4 Digit)</label>
+          <div class="input-with-icon"><span class="field-icon">&#128273;</span>
+          <input type="text" id="adminPin" class="form-control auth-input" placeholder="Contoh: 8891" value="8891" maxlength="4" required /></div>
+        </div>
+        <button type="submit" class="btn btn-auth-submit admin-btn-glow mt-3">
+          <span>&#128737; MASUK CONTROL CENTER LABORAN</span>
+        </button>
+      </form>
+      <div class="auth-footer-switch">
+        <span>Bukan Laboran / Admin?</span>
+        <button type="button" class="switch-link-btn" onclick="switchToAslabLogin()">&#127891; Login Portal ASLAB &rarr;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LOGIN ASLAB ===== -->
+<div class="auth-fullscreen-view" id="view-login-aslab">
+  <div class="auth-bg-overlay user-bg-overlay"></div>
+  <div class="auth-wrapper">
+    <div class="auth-glass-card user-theme-card">
+      <div class="auth-header">
+        <div class="uir-logo-container user-logo-glow">
+          <img src="logo-uir.png" class="uir-logo-img" alt="Logo UIR" onerror="this.style.display='none'" />
+        </div>
+        <div class="auth-titles">
+          <span class="auth-badge-tag user-badge">&#127891; PORTAL ASISTEN LABORATORIUM (ASLAB)</span>
+          <h1 class="auth-title">UNIVERSITAS ISLAM RIAU</h1>
+          <p class="auth-sub">Akses Jadwal, Absensi, Modul dan Nilai Akhir Saya</p>
+        </div>
+      </div>
+      <form class="auth-form" onsubmit="event.preventDefault(); handleAslabAuth();">
+        <div class="form-field">
+          <label>Username ASLAB</label>
+          <div class="input-with-icon"><span class="field-icon">&#127891;</span>
+          <input type="text" id="aslabUsername" class="form-control auth-input" placeholder="Contoh: andi / budi / citra" value="andi" required /></div>
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <div class="input-with-icon"><span class="field-icon">&#128273;</span>
+          <input type="password" id="aslabPassword" class="form-control auth-input" placeholder="Password ASLAB" value="andi123" required /></div>
+        </div>
+        <button type="submit" class="btn btn-auth-submit user-btn-glow mt-3">
+          <span>&#128640; MASUK PORTAL ASLAB</span>
+        </button>
+      </form>
+      <div class="auth-footer-switch">
+        <span>Laboran / Pengelola Lab?</span>
+        <button type="button" class="switch-link-btn" onclick="switchToAdminLogin()">&#128737; Switch ke Portal Laboran &rarr;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN DASHBOARD ===== -->
+<div class="main-dashboard-app hidden" id="app-dashboard-container">
+  <div class="glow-sphere sphere-1"></div>
+  <div class="glow-sphere sphere-2"></div>
+  <div class="glow-sphere sphere-3"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-box">
+        <div class="sidebar-logo-wrapper">
+          <img src="logo-uir.png" class="sidebar-logo-img" alt="Logo UIR" onerror="this.style.display='none'" />
+        </div>
+        <div class="logo-meta">
+          <span class="logo-title">SILAB UIR</span>
+          <span class="logo-subtitle">Universitas Islam Riau</span>
+        </div>
+      </div>
+    </div>
+    <div class="role-card-sidebar">
+      <div class="role-indicator" id="roleDot"></div>
+      <div class="role-details">
+        <span class="role-label">Mode Akses</span>
+        <span class="role-name" id="currentRoleText">Laboran</span>
+      </div>
+      <button class="role-switch-btn" onclick="logoutToLoginScreen()" title="Logout">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="user-profile" onclick="logoutToLoginScreen()">
+        <div class="avatar" id="userAvatar">A</div>
+        <div class="user-meta">
+          <span class="user-name" id="userName">Administrator</span>
+          <span class="user-sub" id="userEmail">lab@uir.ac.id</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-wrapper" id="mainContent">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-button sidebar-toggle" onclick="toggleSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div class="breadcrumb">
+          <span class="bc-root">SILAB UIR</span>
+          <span class="bc-sep">/</span>
+          <span class="bc-current" id="breadcrumbText">Dashboard</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="system-status-pill">
+          <span class="status-pulse"></span>
+          <span>SILAB UIR Aktif</span>
+        </div>
+        <div class="clock-badge" id="timeDisplay">00:00:00</div>
+        <button class="btn btn-login-top" onclick="logoutToLoginScreen()">
+          <span>&#128682; Logout</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <section class="page-view" id="page-dashboard"></section>
+      <section class="page-view" id="page-matkul"></section>
+      <section class="page-view" id="page-aslab"></section>
+      <section class="page-view" id="page-lab"></section>
+      <section class="page-view" id="page-jadwal"></section>
+      <section class="page-view" id="page-modul-admin"></section>
+      <section class="page-view" id="page-absensi-admin"></section>
+      <section class="page-view" id="page-rekap"></section>
+      <section class="page-view" id="page-monitoring"></section>
+      <section class="page-view" id="page-inventaris"></section>
+      <section class="page-view" id="page-jadwal-aslab"></section>
+      <section class="page-view" id="page-absensi-aslab"></section>
+      <section class="page-view" id="page-modul-aslab"></section>
+      <section class="page-view" id="page-nilai"></section>
+    </div>
+  </main>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Modal Mata Kuliah -->
+<div class="modal-overlay" id="modalMatkul">
+  <div class="modal-card">
+    <div class="modal-header"><h3>&#128218; Tambah Mata Kuliah</h3>
+    <button class="modal-close" onclick="closeModal('modalMatkul')">&#10005;</button></div>
+    <div class="modal-body">
+      <div class="form-field"><label>Kode Mata Kuliah *</label><input type="text" id="mkKode" class="form-control" placeholder="IF201" /></div>
+      <div class="form-field"><label>Nama Mata Kuliah *</label><input type="text" id="mkNama" class="form-control" placeholder="Pemrograman Web" /></div>
+      <div class="form-field"><label>SKS</label><input type="number" id="mkSks" class="form-control" value="3" min="1" max="6" /></div>
+      <div class="form-field"><label>Dosen Pengampu *</label><input type="text" id="mkDosen" class="form-control" placeholder="Nama Dosen" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalMatkul')">Batal</button>
+      <button class="btn btn-primary" onclick="addMatkul()">&#10003; Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal ASLAB -->
+<div class="modal-overlay" id="modalAslab">
+  <div class="modal-card">
+    <div class="modal-header"><h3>&#128104;&#8205;&#127979; Tambah Data ASLAB</h3>
+    <button class="modal-close" onclick="closeModal('modalAslab')">&#10005;</button></div>
+    <div class="modal-body">
+      <div class="form-field"><label>NIM / ID ASLAB *</label><input type="text" id="asNim" class="form-control" placeholder="ASLAB006" /></div>
+      <div class="form-field"><label>Nama Lengkap *</label><input type="text" id="asNama" class="form-control" placeholder="Nama Lengkap" /></div>
+      <div class="form-field"><label>Username Login *</label><input type="text" id="asUsername" class="form-control" placeholder="username (tanpa spasi)" /></div>
+      <div class="form-field"><label>Password *</label><input type="password" id="asPassword" class="form-control" placeholder="password" /></div>
+      <div class="form-field"><label>Laboratorium</label>
+        <select id="asLab" class="form-control form-select">
+          <option>Lab 1</option><option>Lab 2</option><option>Lab 3</option><option>Lab 4</option><option>Lab 5</option>
+        </select>
+      </div>
+      <div class="form-field"><label>Mata Kuliah (pisah koma)</label><input type="text" id="asMatkul" class="form-control" placeholder="Pemrograman Web, Basis Data" /></div>
+      <div class="form-field"><label>No. Kontak</label><input type="text" id="asContact" class="form-control" placeholder="08xx-xxxx-xxxx" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalAslab')">Batal</button>
+      <button class="btn btn-primary" onclick="addAslab()">&#10003; Simpan ASLAB</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Laboratorium -->
+<div class="modal-overlay" id="modalLab">
+  <div class="modal-card">
+    <div class="modal-header"><h3>&#127963; Tambah Laboratorium</h3>
+    <button class="modal-close" onclick="closeModal('modalLab')">&#10005;</button></div>
+    <div class="modal-body">
+      <div class="form-field"><label>Nama Lab *</label><input type="text" id="lbNama" class="form-control" placeholder="Lab 6" /></div>
+      <div class="form-field"><label>Kapasitas (PC)</label><input type="number" id="lbKapasitas" class="form-control" value="30" /></div>
+      <div class="form-field"><label>Keterangan</label><input type="text" id="lbKeterangan" class="form-control" placeholder="Fungsi lab ini" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalLab')">Batal</button>
+      <button class="btn btn-primary" onclick="addLab()">&#10003; Simpan Lab</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Jadwal -->
+<div class="modal-overlay" id="modalJadwal">
+  <div class="modal-card modal-wide">
+    <div class="modal-header"><h3>&#128197; Tambah Jadwal Praktikum</h3>
+    <button class="modal-close" onclick="closeModal('modalJadwal')">&#10005;</button></div>
+    <div class="modal-body">
+      <div class="form-row-2">
+        <div class="form-field"><label>Mata Kuliah *</label><select id="jdMatkul" class="form-control form-select"></select></div>
+        <div class="form-field"><label>ASLAB Pengampu *</label><select id="jdAslab" class="form-control form-select"></select></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-field"><label>Laboratorium</label><select id="jdLab" class="form-control form-select"></select></div>
+        <div class="form-field"><label>Pertemuan ke-</label>
+          <select id="jdPertemuan" class="form-control form-select">
+            <option value="1">Pertemuan 1</option><option value="2">Pertemuan 2</option>
+            <option value="3">Pertemuan 3</option><option value="4">Pertemuan 4</option>
+            <option value="5">Pertemuan 5</option><option value="6">Pertemuan 6</option>
+            <option value="7">Pertemuan 7</option><option value="8">Pertemuan 8</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-field"><label>Tanggal *</label><input type="date" id="jdTanggal" class="form-control" /></div>
+        <div class="form-field"><label>Jam Mulai *</label><input type="time" id="jdJamMulai" class="form-control" value="08:00" /></div>
+        <div class="form-field"><label>Jam Selesai *</label><input type="time" id="jdJamSelesai" class="form-control" value="10:00" /></div>
+      </div>
+      <div class="form-field"><label>Materi Praktikum</label><input type="text" id="jdMateri" class="form-control" placeholder="Topik materi pertemuan ini" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalJadwal')">Batal</button>
+      <button class="btn btn-primary" onclick="addJadwal()">&#10003; Simpan Jadwal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Modul -->
+<div class="modal-overlay" id="modalModul">
+  <div class="modal-card">
+    <div class="modal-header"><h3>&#128193; Tambah Modul Praktikum</h3>
+    <button class="modal-close" onclick="closeModal('modalModul')">&#10005;</button></div>
+    <div class="modal-body">
+      <div class="form-field"><label>Judul Modul *</label><input type="text" id="mdJudul" class="form-control" placeholder="Judul modul" /></div>
+      <div class="form-row-2">
+        <div class="form-field"><label>Mata Kuliah</label><select id="mdMatkul" class="form-control form-select"></select></div>
+        <div class="form-field"><label>Pertemuan ke-</label>
+          <select id="mdPertemuan" class="form-control form-select">
+            <option value="1">Pertemuan 1</option><option value="2">Pertemuan 2</option>
+            <option value="3">Pertemuan 3</option><option value="4">Pertemuan 4</option>
+            <option value="5">Pertemuan 5</option><option value="6">Pertemuan 6</option>
+            <option value="7">Pertemuan 7</option><option value="8">Pertemuan 8</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field"><label>Deskripsi</label><textarea id="mdDeskripsi" class="form-control" rows="3" placeholder="Deskripsi modul..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalModul')">Batal</button>
+      <button class="btn btn-primary" onclick="addModul()">&#10003; Simpan Modul</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nilai -->
+<div class="modal-overlay" id="modalNilai">
+  <div class="modal-card">
+    <div class="modal-header"><h3 id="modalNilaiTitle">&#127942; Input Nilai Akhir</h3>
+    <button class="modal-close" onclick="closeModal('modalNilai')">&#10005;</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="nvEditId" value="-1" />
+      <div class="form-row-2">
+        <div class="form-field"><label>NIM Mahasiswa *</label><input type="text" id="nvNim" class="form-control" placeholder="21IF001" /></div>
+        <div class="form-field"><label>Nama Mahasiswa *</label><input type="text" id="nvNama" class="form-control" placeholder="Nama lengkap" /></div>
+      </div>
+      <div class="form-field"><label>Mata Kuliah</label><select id="nvMatkul" class="form-control form-select"></select></div>
+      <div class="form-row-2">
+        <div class="form-field"><label>Nilai Tugas (40%)</label><input type="number" id="nvNilaiTugas" class="form-control" min="0" max="100" placeholder="0-100" oninput="calcNilaiPreview()" /></div>
+        <div class="form-field"><label>Nilai Ujian (60%)</label><input type="number" id="nvNilaiUjian" class="form-control" min="0" max="100" placeholder="0-100" oninput="calcNilaiPreview()" /></div>
+      </div>
+      <div class="nilai-preview-box" id="nvPreview">Nilai Akhir: - | Grade: -</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalNilai')">Batal</button>
+      <button class="btn btn-primary" onclick="saveNilai()">&#10003; Simpan Nilai</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Import Nilai -->
+<div class="modal-overlay" id="modalImportNilai">
+  <div class="modal-card modal-card-wide">
+    <div class="modal-header"><h3>&#128229; Import Data Nilai</h3>
+    <button class="modal-close" onclick="closeModal('modalImportNilai')">&#10005;</button></div>
+    <div class="modal-body">
+      <div class="import-steps">
+        <span class="import-step"><b>1</b> Unduh template</span>
+        <span class="import-step"><b>2</b> Isi data</span>
+        <span class="import-step"><b>3</b> Unggah file</span>
+      </div>
+      <label class="import-dropzone" id="importDropzone" for="importNilaiFile">
+        <div class="import-dz-icon">&#128194;</div>
+        <div class="import-dz-title">Klik atau seret file ke sini</div>
+        <div class="import-dz-sub">Format didukung: <code>.csv</code>, <code>.xlsx</code>, <code>.xls</code></div>
+        <div class="import-dz-file" id="importFileName"></div>
+      </label>
+      <input type="file" id="importNilaiFile" accept=".csv,.xlsx,.xls" hidden onchange="handleImportNilaiFile(this.files[0])" />
+      <div class="import-help">
+        Kolom wajib: <code>NIM</code>, <code>Nama Mahasiswa</code>, <code>Mata Kuliah</code>, <code>Nilai Tugas</code>, <code>Nilai Ujian</code>.
+        <a href="#" onclick="downloadNilaiTemplate();return false;">&#11015; Unduh template CSV</a>
+      </div>
+      <label class="import-option"><input type="checkbox" id="importOverwrite" checked onchange="reprocessImportNilai()" /> Perbarui data jika NIM + Mata Kuliah sudah ada</label>
+      <div id="importPreview"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalImportNilai')">Batal</button>
+      <button class="btn btn-primary" id="btnConfirmImport" onclick="confirmImportNilai()" disabled>&#10003; Import Data</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Inventaris -->
+<div class="modal-overlay" id="modalInventaris">
+  <div class="modal-card">
+    <div class="modal-header"><h3>&#128187; Tambah Aset Inventaris</h3>
+    <button class="modal-close" onclick="closeModal('modalInventaris')">&#10005;</button></div>
+    <div class="modal-body">
+      <div class="form-field"><label>Nama Perangkat *</label><input type="text" id="invNama" class="form-control" placeholder="PC Workstation Core i7" /></div>
+      <div class="form-row-2">
+        <div class="form-field"><label>Laboratorium</label>
+          <select id="invLab" class="form-control form-select">
+            <option>Lab 1</option><option>Lab 2</option><option>Lab 3</option><option>Lab 4</option><option>Lab 5</option>
+          </select>
+        </div>
+        <div class="form-field"><label>Jumlah Unit</label><input type="number" id="invJumlah" class="form-control" value="1" min="1" /></div>
+      </div>
+      <div class="form-field"><label>Kondisi</label>
+        <select id="invKondisi" class="form-control form-select">
+          <option value="Bagus">Bagus</option>
+          <option value="Perlu Perbaikan">Perlu Perbaikan</option>
+          <option value="Rusak">Rusak</option>
+        </select>
+      </div>
+      <div class="form-field"><label>Keterangan</label><input type="text" id="invKeterangan" class="form-control" placeholder="Keterangan kondisi" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalInventaris')">Batal</button>
+      <button class="btn btn-primary" onclick="addInventaris()">&#10003; Simpan Aset</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast-container"></div>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="app.js?v=2"></script>
+</body>
+</html>
