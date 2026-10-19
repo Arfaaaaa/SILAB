@@ -63,8 +63,8 @@ Sistem Informasi Laboratorium Terpadu (**SILAB UIR**) adalah aplikasi web (*Sing
 
 ```bash
 # Clone repositori
-git clone https://github.com/Arfaaaaa/Sistem-Laboratorium-SILAB-.git
-cd Sistem-Laboratorium-SILAB-
+git clone https://github.com/Arfaaaaa/SILAB.git
+cd SILAB
 
 # Jalankan server lokal
 python -m http.server 8000
