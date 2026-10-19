@@ -249,10 +249,10 @@ function restoreSession() {
 }
 
 function resetDataWithConfirm() {
-  if (confirm('Apakah Anda yakin ingin me-reset seluruh data demo ke kondisi awal (seed data)?\nSemua perubahan jadwal, absensi, modul, dan nilai akan dikembalikan ke data default.')) {
+  if (confirm('Apakah Anda yakin ingin mengembalikan seluruh data sistem ke kondisi awal (default)?\nSemua data lokal akan disinkronkan kembali ke pengaturan awal.')) {
     localStorage.removeItem('silab_uir_db');
     localStorage.removeItem('silab_uir_counters');
-    showToast('Data demo berhasil di-reset ke kondisi awal!');
+    showToast('Data sistem berhasil disinkronkan ke kondisi awal!');
     setTimeout(() => location.reload(), 600);
   }
 }
@@ -1253,9 +1253,9 @@ function renderAbsensiAslab() {
     '<span style="font-size:13px;">⏰ <strong>Waktu Sekarang:</strong> ' + formatTimeDisplay(now) + ' WIB — ' + formatTanggal(todayStr) +
     '<br><small style="color:var(--text-muted);">Absensi hanya bisa dilakukan saat sudah memasuki waktu jadwal.</small></span></div>' +
     '<div class="glass-card mb-4" style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.3);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">' +
-    '<div><div style="font-weight:700;color:var(--emerald);font-size:13.5px;">⚡ Mode Pengujian Dosen: Tombol Presensi Hari Ini Aktif</div>' +
-    '<div style="font-size:12px;color:var(--text-muted);margin-top:3px;">Sesi praktikum untuk hari ini (<strong>' + formatTanggal(todayStr) + '</strong>) sudah disiapkan. Anda dapat langsung menguji klik tombol <strong>✅ ABSEN</strong>.</div></div>' +
-    '<button class="btn btn-xs btn-primary" onclick="tambahJadwalHariIni()">➕ Tambah Sesi Uji Coba Baru</button></div>';
+    '<div><div style="font-weight:700;color:var(--emerald);font-size:13.5px;">🟢 Sesi Praktikum Aktif Hari Ini (' + formatTanggal(todayStr) + ')</div>' +
+    '<div style="font-size:12px;color:var(--text-muted);margin-top:3px;">Sesi praktikum terdaftar secara resmi. Asisten Lab silakan lakukan presensi kehadiran melalui tombol <strong>✅ ABSEN</strong>.</div></div>' +
+    '<button class="btn btn-xs btn-primary" onclick="tambahJadwalHariIni()">➕ Tambah Sesi Praktikum</button></div>';
 
   currentUser.matkul.forEach(mk => {
     const jMk = myJ.filter(j => j.matkul===mk);
@@ -1270,7 +1270,7 @@ function renderAbsensiAslab() {
         let statusHtml = '';
         if (abs) {
           statusHtml = '<span class="badge-status tersedia">✅ Sudah Absen (' + abs.waktuAbsen + ' WIB)</span> ' +
-            '<button class="btn btn-xs btn-outline" style="font-size:11px;margin-left:6px;" onclick="batalAbsen(' + abs.id + ')" title="Reset status untuk uji coba tombol lagi">↺ Uji Ulang</button>';
+            '<button class="btn btn-xs btn-outline" style="font-size:11px;margin-left:6px;" onclick="batalAbsen(' + abs.id + ')" title="Batalkan presensi">↺ Batal Presensi</button>';
         } else if (!isToday) {
           const tgl = new Date(j.tanggal + 'T00:00:00');
           statusHtml = tgl < now ?

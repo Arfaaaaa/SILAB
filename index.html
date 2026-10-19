@@ -30,28 +30,22 @@
         <div class="form-field">
           <label>NIP / Username Laboran</label>
           <div class="input-with-icon"><span class="field-icon">&#128100;</span>
-          <input type="text" id="adminUser" class="form-control auth-input" placeholder="Username Laboran" value="admin_uir" required /></div>
+          <input type="text" id="adminUser" class="form-control auth-input" placeholder="Masukkan Username Laboran" required /></div>
         </div>
         <div class="form-field">
           <label>Kata Sandi</label>
           <div class="input-with-icon"><span class="field-icon">&#128274;</span>
-          <input type="password" id="adminPass" class="form-control auth-input" placeholder="Password" value="admin123" required /></div>
+          <input type="password" id="adminPass" class="form-control auth-input" placeholder="Masukkan Kata Sandi" required /></div>
         </div>
         <div class="form-field">
           <label>PIN Otorisasi (4 Digit)</label>
           <div class="input-with-icon"><span class="field-icon">&#128273;</span>
-          <input type="text" id="adminPin" class="form-control auth-input" placeholder="Contoh: 8891" value="8891" maxlength="4" required /></div>
+          <input type="text" id="adminPin" class="form-control auth-input" placeholder="Contoh: 8891" maxlength="4" required /></div>
         </div>
         <button type="submit" class="btn btn-auth-submit admin-btn-glow mt-3">
           <span>&#128737; MASUK CONTROL CENTER LABORAN</span>
         </button>
       </form>
-      <div class="quick-preset-box mt-3">
-        <span class="preset-label">&#9889; DEMO PENGUJIAN (KLIK LANGSUNG MASUK):</span>
-        <div class="preset-buttons">
-          <button type="button" class="btn-preset-chip" onclick="quickFillAdmin()">&#128737; Masuk Otomatis sbg Laboran (Admin)</button>
-        </div>
-      </div>
       <div class="auth-footer-switch">
         <span>Bukan Laboran / Admin?</span>
         <button type="button" class="switch-link-btn" onclick="switchToAslabLogin()">&#127891; Login Portal ASLAB &rarr;</button>
@@ -79,27 +73,17 @@
         <div class="form-field">
           <label>Username ASLAB</label>
           <div class="input-with-icon"><span class="field-icon">&#127891;</span>
-          <input type="text" id="aslabUsername" class="form-control auth-input" placeholder="Contoh: andi / budi / citra" value="andi" required /></div>
+          <input type="text" id="aslabUsername" class="form-control auth-input" placeholder="Masukkan Username ASLAB" required /></div>
         </div>
         <div class="form-field">
           <label>Password</label>
           <div class="input-with-icon"><span class="field-icon">&#128273;</span>
-          <input type="password" id="aslabPassword" class="form-control auth-input" placeholder="Password ASLAB" value="andi123" required /></div>
+          <input type="password" id="aslabPassword" class="form-control auth-input" placeholder="Masukkan Password ASLAB" required /></div>
         </div>
         <button type="submit" class="btn btn-auth-submit user-btn-glow mt-3">
           <span>&#128640; MASUK PORTAL ASLAB</span>
         </button>
       </form>
-      <div class="quick-preset-box mt-3">
-        <span class="preset-label">&#9889; DEMO PENGUJIAN (PILIH AKUN ASLAB):</span>
-        <div class="preset-buttons">
-          <button type="button" class="btn-preset-chip" onclick="quickFillAslab('andi','andi123')">&#128100; Andi (Web &amp; AI)</button>
-          <button type="button" class="btn-preset-chip" onclick="quickFillAslab('budi','budi123')">&#128100; Budi (Basis Data)</button>
-          <button type="button" class="btn-preset-chip" onclick="quickFillAslab('citra','citra123')">&#128100; Citra (Jaringan)</button>
-          <button type="button" class="btn-preset-chip" onclick="quickFillAslab('dian','dian123')">&#128100; Dian (Mobile)</button>
-          <button type="button" class="btn-preset-chip" onclick="quickFillAslab('eko','eko123')">&#128100; Eko (AI &amp; DB)</button>
-        </div>
-      </div>
       <div class="auth-footer-switch">
         <span>Laboran / Pengelola Lab?</span>
         <button type="button" class="switch-link-btn" onclick="switchToAdminLogin()">&#128737; Switch ke Portal Laboran &rarr;</button>
@@ -166,8 +150,8 @@
           <span>SILAB UIR Aktif</span>
         </div>
         <div class="clock-badge" id="timeDisplay">00:00:00</div>
-        <button class="btn btn-xs btn-outline" onclick="resetDataWithConfirm()" title="Reset data demo ke awal bawaan" style="border-color:rgba(255,255,255,0.18); font-size:11.5px; padding: 6px 10px;">
-          <span>&#128259; Reset Data Demo</span>
+        <button class="btn btn-xs btn-outline" onclick="resetDataWithConfirm()" title="Kembalikan data sistem ke default" style="border-color:rgba(255,255,255,0.18); font-size:11.5px; padding: 6px 10px;">
+          <span>&#128259; Sinkron Data Bawaan</span>
         </button>
         <button class="btn btn-login-top" onclick="logoutToLoginScreen()">
           <span>&#128682; Logout</span>
