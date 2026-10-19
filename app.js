@@ -135,6 +135,128 @@ let counters = { jadwal:41, absensi:4, nilai:6, inventaris:6, matkul:6, aslab:6,
 let currentRole = null;
 let currentUser = null;
 
+// Simpan clone data bawaan untuk keperluan Reset Data Demo
+const defaultDbSeed = JSON.parse(JSON.stringify(db));
+const defaultCountersSeed = JSON.parse(JSON.stringify(counters));
+
+// ============================================================
+// STORAGE & DATA PERSISTENCE (LOCALSTORAGE)
+// ============================================================
+function saveDB() {
+  try {
+    localStorage.setItem('silab_uir_db', JSON.stringify(db));
+    localStorage.setItem('silab_uir_counters', JSON.stringify(counters));
+  } catch (e) {
+    console.error('Gagal menyimpan database ke localStorage:', e);
+  }
+}
+
+function loadDB() {
+  try {
+    const rawDB = localStorage.getItem('silab_uir_db');
+    const rawCounters = localStorage.getItem('silab_uir_counters');
+    if (rawDB) {
+      db = JSON.parse(rawDB);
+    } else {
+      ensureTestScheduleForToday();
+      saveDB();
+    }
+    if (rawCounters) {
+      counters = JSON.parse(rawCounters);
+    }
+    // Pastikan selalu ada jadwal untuk hari ini agar tombol absensi bisa diuji
+    ensureTestScheduleForToday();
+  } catch (e) {
+    console.error('Gagal memuat database dari localStorage:', e);
+    ensureTestScheduleForToday();
+  }
+}
+
+function ensureTestScheduleForToday() {
+  const todayStr = toDateString(new Date());
+  if (!db || !Array.isArray(db.aslab) || !Array.isArray(db.jadwal)) return;
+  let added = false;
+  db.aslab.forEach(a => {
+    const hasToday = db.jadwal.some(j => j.aslab === a.nama && j.tanggal === todayStr);
+    if (!hasToday) {
+      const mk = (a.matkul && a.matkul[0]) ? a.matkul[0] : 'Pemrograman Web';
+      db.jadwal.unshift({
+        id: counters.jadwal++,
+        matkul: mk,
+        aslab: a.nama,
+        lab: a.lab || 'Lab 1',
+        pertemuan: 6,
+        tanggal: todayStr,
+        jamMulai: '07:00',
+        jamSelesai: '23:59',
+        materi: 'Sesi Praktikum Aktif Hari Ini (' + formatTanggal(todayStr) + ') — Siap Presensi'
+      });
+      added = true;
+    }
+  });
+  if (added) saveDB();
+}
+
+function saveSession(role, user, page) {
+  try {
+    localStorage.setItem('silab_session', JSON.stringify({ role, user, page: page || 'dashboard' }));
+  } catch (e) {
+    console.error('Gagal menyimpan sesi:', e);
+  }
+}
+
+function clearSession() {
+  try {
+    localStorage.removeItem('silab_session');
+  } catch (e) {
+    console.error('Gagal menghapus sesi:', e);
+  }
+}
+
+function restoreSession() {
+  try {
+    const raw = localStorage.getItem('silab_session');
+    if (!raw) return false;
+    const session = JSON.parse(raw);
+    if (!session || !session.role || !session.user) return false;
+    currentRole = session.role;
+    currentUser = session.user;
+
+    document.querySelectorAll('.auth-fullscreen-view').forEach(el => el.classList.remove('active-view'));
+    document.getElementById('app-dashboard-container').classList.remove('hidden');
+
+    if (currentRole === 'admin') {
+      document.getElementById('currentRoleText').textContent = 'Laboran (Admin)';
+      document.getElementById('roleDot').style.background = 'var(--emerald)';
+      document.getElementById('userName').textContent = currentUser.nama || 'Laboran';
+      document.getElementById('userEmail').textContent = 'laboran.admin@uir.ac.id';
+      document.getElementById('userAvatar').textContent = (currentUser.nama || 'A').charAt(0).toUpperCase();
+      buildAdminSidebar();
+    } else {
+      document.getElementById('currentRoleText').textContent = 'ASLAB';
+      document.getElementById('roleDot').style.background = 'var(--cyan)';
+      document.getElementById('userName').textContent = currentUser.nama;
+      document.getElementById('userEmail').textContent = (currentUser.nim || 'aslab').toLowerCase() + '@aslab.uir.ac.id';
+      document.getElementById('userAvatar').textContent = currentUser.nama.charAt(0);
+      buildAslabSidebar();
+    }
+    navigateTo(session.page || 'dashboard');
+    return true;
+  } catch (e) {
+    console.error('Gagal memulihkan sesi login:', e);
+    return false;
+  }
+}
+
+function resetDataWithConfirm() {
+  if (confirm('Apakah Anda yakin ingin me-reset seluruh data demo ke kondisi awal (seed data)?\nSemua perubahan jadwal, absensi, modul, dan nilai akan dikembalikan ke data default.')) {
+    localStorage.removeItem('silab_uir_db');
+    localStorage.removeItem('silab_uir_counters');
+    showToast('Data demo berhasil di-reset ke kondisi awal!');
+    setTimeout(() => location.reload(), 600);
+  }
+}
+
 // ============================================================
 // AUTH
 // ============================================================
@@ -143,9 +265,10 @@ function handleAdminAuth() {
   const pass = document.getElementById('adminPass').value.trim();
   const pin  = document.getElementById('adminPin').value.trim();
   if (!user || !pass || !pin) { showToast('Semua field wajib diisi!','error'); return; }
-  if (pin !== '8891') { showToast('PIN Otorisasi salah!','error'); return; }
+  if (pin !== '8891') { showToast('PIN Otorisasi salah! (Gunakan 8891)','error'); return; }
   currentRole = 'admin';
   currentUser = { nama: user, role: 'admin' };
+  saveSession('admin', currentUser, 'dashboard');
   document.getElementById('view-login-admin').classList.remove('active-view');
   document.getElementById('app-dashboard-container').classList.remove('hidden');
   document.getElementById('currentRoleText').textContent = 'Laboran (Admin)';
@@ -167,6 +290,7 @@ function handleAslabAuth() {
   if (found.status !== 'Aktif') { showToast('Akun ASLAB tidak aktif. Hubungi Laboran.','error'); return; }
   currentRole = 'aslab';
   currentUser = found;
+  saveSession('aslab', currentUser, 'dashboard');
   document.getElementById('view-login-aslab').classList.remove('active-view');
   document.getElementById('app-dashboard-container').classList.remove('hidden');
   document.getElementById('currentRoleText').textContent = 'ASLAB';
@@ -180,6 +304,7 @@ function handleAslabAuth() {
 }
 
 function logoutToLoginScreen() {
+  clearSession();
   document.getElementById('app-dashboard-container').classList.add('hidden');
   if (currentRole === 'admin') {
     document.getElementById('view-login-admin').classList.add('active-view');
@@ -271,6 +396,12 @@ function navigateTo(pageId) {
   };
   const bc = document.getElementById('breadcrumbText');
   if (bc) bc.textContent = labels[pageId] || pageId;
+  if (currentRole && currentUser) {
+    saveSession(currentRole, currentUser, pageId);
+  }
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar')?.classList.remove('mobile-open');
+  }
   switch(pageId) {
     case 'dashboard':     renderDashboard();     break;
     case 'matkul':        renderMatkul();        break;
@@ -372,7 +503,7 @@ function renderMatkul() {
   el.innerHTML =
     '<div class="view-header"><div><h1 class="view-title">Mata Kuliah Praktikum</h1>' +
     '<p class="view-desc">Data mata kuliah yang dikelola di laboratorium.</p></div>' +
-    '<button class="btn btn-primary" onclick="openModal(\'modalMatkul\')">+ Tambah Mata Kuliah</button></div>' +
+    '<button class="btn btn-primary" onclick="openMatkulModal()">+ Tambah Mata Kuliah</button></div>' +
     '<div class="glass-card"><div class="card-title-bar"><h3>📚 Daftar Mata Kuliah</h3>' +
     '<input type="text" class="search-input input-sm" id="searchMatkul" placeholder="🔍 Cari..." oninput="renderMatkulTable()"/></div>' +
     '<div class="table-responsive"><table class="custom-table">' +
@@ -389,23 +520,57 @@ function renderMatkulTable() {
   tbody.innerHTML = d.length === 0 ? '<tr><td colspan="7" class="empty-cell">Tidak ada data.</td></tr>' :
     d.map((m, i) => '<tr><td>' + (i+1) + '</td><td><code>' + m.kode + '</code></td><td><strong>' + m.nama + '</strong></td>' +
       '<td>' + m.sks + ' SKS</td><td>' + m.dosen + '</td><td>' + statusBadge(m.status) + '</td>' +
-      '<td><button class="btn btn-xs btn-danger" onclick="deleteMatkul(' + m.id + ')">🗑 Hapus</button></td></tr>').join('');
+      '<td><button class="btn btn-xs btn-outline me-1" onclick="editMatkul(' + m.id + ')">✏️ Edit</button>' +
+      '<button class="btn btn-xs btn-danger" onclick="deleteMatkul(' + m.id + ')">🗑 Hapus</button></td></tr>').join('');
+}
+
+function openMatkulModal() {
+  document.getElementById('mkEditId').value = -1;
+  document.getElementById('mkKode').value = '';
+  document.getElementById('mkNama').value = '';
+  document.getElementById('mkSks').value = 3;
+  document.getElementById('mkDosen').value = '';
+  document.getElementById('modalMatkulTitle').textContent = '📚 Tambah Mata Kuliah';
+  openModal('modalMatkul');
+}
+
+function editMatkul(id) {
+  const m = db.matkul.find(x => x.id === id);
+  if (!m) return;
+  document.getElementById('mkEditId').value = m.id;
+  document.getElementById('mkKode').value = m.kode;
+  document.getElementById('mkNama').value = m.nama;
+  document.getElementById('mkSks').value = m.sks;
+  document.getElementById('mkDosen').value = m.dosen;
+  document.getElementById('modalMatkulTitle').textContent = '✏️ Edit Mata Kuliah';
+  openModal('modalMatkul');
 }
 
 function addMatkul() {
+  const editId = parseInt(document.getElementById('mkEditId').value) || -1;
   const kode = document.getElementById('mkKode').value.trim();
   const nama = document.getElementById('mkNama').value.trim();
   const sks  = parseInt(document.getElementById('mkSks').value) || 3;
   const dosen= document.getElementById('mkDosen').value.trim();
   if (!kode||!nama||!dosen) { showToast('Semua field wajib diisi!','error'); return; }
-  db.matkul.push({ id:counters.matkul++, kode, nama, sks, dosen, status:'Aktif' });
+
+  if (editId > 0) {
+    const item = db.matkul.find(m => m.id === editId);
+    if (item) { item.kode = kode; item.nama = nama; item.sks = sks; item.dosen = dosen; }
+    showToast('Mata kuliah berhasil diperbarui!');
+  } else {
+    db.matkul.push({ id:counters.matkul++, kode, nama, sks, dosen, status:'Aktif' });
+    showToast('Mata kuliah berhasil ditambahkan!');
+  }
+  saveDB();
   closeModal('modalMatkul');
   renderMatkul();
-  showToast('Mata kuliah berhasil ditambahkan!');
 }
+
 function deleteMatkul(id) {
   if (!confirm('Hapus mata kuliah ini?')) return;
   db.matkul = db.matkul.filter(m => m.id !== id);
+  saveDB();
   renderMatkulTable();
   showToast('Mata kuliah dihapus.','error');
 }
@@ -419,7 +584,7 @@ function renderAslab() {
   el.innerHTML =
     '<div class="view-header"><div><h1 class="view-title">Data ASLAB</h1>' +
     '<p class="view-desc">Daftar Asisten Laboratorium yang terdaftar di sistem.</p></div>' +
-    '<button class="btn btn-primary" onclick="openModal(\'modalAslab\')">+ Tambah ASLAB</button></div>' +
+    '<button class="btn btn-primary" onclick="openAslabModal()">+ Tambah ASLAB</button></div>' +
     '<div class="glass-card"><div class="card-title-bar"><h3>👨‍🏫 Daftar ASLAB UIR</h3></div>' +
     '<div class="table-responsive"><table class="custom-table">' +
     '<thead><tr><th>No</th><th>NIM/ID</th><th>Nama ASLAB</th><th>Mata Kuliah Pengampuan</th><th>Lab</th><th>Kontak</th><th>Status</th><th>Aksi</th></tr></thead>' +
@@ -435,10 +600,39 @@ function renderAslabTable() {
       '<td>' + a.matkul.map(m => '<span class="pill-tag glow" style="font-size:11px;">' + m + '</span>').join(' ') + '</td>' +
       '<td>' + a.lab + '</td><td style="font-size:12px;color:var(--text-muted);">' + a.contact + '</td>' +
       '<td>' + statusBadge(a.status) + '</td>' +
-      '<td><button class="btn btn-xs btn-danger" onclick="deleteAslab(' + a.id + ')">🗑 Hapus</button></td></tr>').join('');
+      '<td><button class="btn btn-xs btn-outline me-1" onclick="editAslab(' + a.id + ')">✏️ Edit</button>' +
+      '<button class="btn btn-xs btn-danger" onclick="deleteAslab(' + a.id + ')">🗑 Hapus</button></td></tr>').join('');
+}
+
+function openAslabModal() {
+  document.getElementById('asEditId').value = -1;
+  document.getElementById('asNim').value = '';
+  document.getElementById('asNama').value = '';
+  document.getElementById('asUsername').value = '';
+  document.getElementById('asPassword').value = '';
+  document.getElementById('asMatkul').value = '';
+  document.getElementById('asContact').value = '';
+  document.getElementById('modalAslabTitle').textContent = '👨‍🏫 Tambah Data ASLAB';
+  openModal('modalAslab');
+}
+
+function editAslab(id) {
+  const a = db.aslab.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('asEditId').value = a.id;
+  document.getElementById('asNim').value = a.nim;
+  document.getElementById('asNama').value = a.nama;
+  document.getElementById('asUsername').value = a.username;
+  document.getElementById('asPassword').value = a.password;
+  document.getElementById('asLab').value = a.lab;
+  document.getElementById('asMatkul').value = a.matkul.join(', ');
+  document.getElementById('asContact').value = a.contact === '-' ? '' : a.contact;
+  document.getElementById('modalAslabTitle').textContent = '✏️ Edit Data ASLAB';
+  openModal('modalAslab');
 }
 
 function addAslab() {
+  const editId = parseInt(document.getElementById('asEditId').value) || -1;
   const nim = document.getElementById('asNim').value.trim();
   const nama= document.getElementById('asNama').value.trim();
   const uname=document.getElementById('asUsername').value.trim();
@@ -448,14 +642,27 @@ function addAslab() {
   const mkv = document.getElementById('asMatkul').value;
   if (!nim||!nama||!uname||!pw) { showToast('NIM, Nama, Username, Password wajib!','error'); return; }
   const matkul = mkv ? mkv.split(',').map(s=>s.trim()).filter(Boolean) : [];
-  db.aslab.push({ id:counters.aslab++, nim, nama, username:uname, password:pw, matkul, lab, contact:con||'-', status:'Aktif' });
+
+  if (editId > 0) {
+    const item = db.aslab.find(a => a.id === editId);
+    if (item) {
+      item.nim = nim; item.nama = nama; item.username = uname; item.password = pw;
+      item.lab = lab; item.contact = con || '-'; item.matkul = matkul;
+    }
+    showToast('Data ASLAB berhasil diperbarui!');
+  } else {
+    db.aslab.push({ id:counters.aslab++, nim, nama, username:uname, password:pw, matkul, lab, contact:con||'-', status:'Aktif' });
+    showToast('ASLAB berhasil ditambahkan!');
+  }
+  saveDB();
   closeModal('modalAslab');
   renderAslabTable();
-  showToast('ASLAB berhasil ditambahkan!');
 }
+
 function deleteAslab(id) {
   if (!confirm('Hapus data ASLAB ini?')) return;
   db.aslab = db.aslab.filter(a => a.id !== id);
+  saveDB();
   renderAslabTable();
   showToast('Data ASLAB dihapus.','error');
 }
@@ -469,7 +676,7 @@ function renderLab() {
   el.innerHTML =
     '<div class="view-header"><div><h1 class="view-title">Laboratorium</h1>' +
     '<p class="view-desc">Daftar dan status ruang laboratorium.</p></div>' +
-    '<button class="btn btn-primary" onclick="openModal(\'modalLab\')">+ Tambah Lab</button></div>' +
+    '<button class="btn btn-primary" onclick="openLabModal()">+ Tambah Lab</button></div>' +
     '<div class="labs-5-grid mb-4">' +
     db.labs.map(lab =>
       '<div class="lab-card-item"><div class="lab-card-top">' +
@@ -482,27 +689,66 @@ function renderLab() {
       '<option value="tersedia"'    + (lab.status==='tersedia'    ?' selected':'') + '>🟢 Tersedia</option>' +
       '<option value="sedang"'      + (lab.status==='sedang'      ?' selected':'') + '>🟡 Sedang Dipakai</option>' +
       '<option value="maintenance"' + (lab.status==='maintenance' ?' selected':'') + '>🔴 Maintenance</option>' +
-      '</select><button class="btn btn-xs btn-danger" onclick="deleteLab(' + lab.id + ')">🗑</button>' +
+      '</select>' +
+      '<button class="btn btn-xs btn-outline" onclick="editLab(' + lab.id + ')">✏️</button>' +
+      '<button class="btn btn-xs btn-danger" onclick="deleteLab(' + lab.id + ')">🗑</button>' +
       '</div></div>'
     ).join('') + '</div>';
 }
+
+function openLabModal() {
+  document.getElementById('lbEditId').value = -1;
+  document.getElementById('lbNama').value = '';
+  document.getElementById('lbKapasitas').value = 30;
+  document.getElementById('lbKeterangan').value = '';
+  document.getElementById('modalLabTitle').textContent = '🏛️ Tambah Laboratorium';
+  openModal('modalLab');
+}
+
+function editLab(id) {
+  const l = db.labs.find(x => x.id === id);
+  if (!l) return;
+  document.getElementById('lbEditId').value = l.id;
+  document.getElementById('lbNama').value = l.nama;
+  document.getElementById('lbKapasitas').value = l.kapasitas;
+  document.getElementById('lbKeterangan').value = l.keterangan;
+  document.getElementById('modalLabTitle').textContent = '✏️ Edit Data Laboratorium';
+  openModal('modalLab');
+}
+
 function updateLabStatus(id, status) {
   const lab = db.labs.find(l => l.id===id);
-  if (lab) { lab.status = status; showToast('Status ' + lab.nama + ' diperbarui.'); }
+  if (lab) {
+    lab.status = status;
+    saveDB();
+    showToast('Status ' + lab.nama + ' diperbarui.');
+  }
 }
+
 function addLab() {
+  const editId = parseInt(document.getElementById('lbEditId').value) || -1;
   const nama = document.getElementById('lbNama').value.trim();
   const kap  = parseInt(document.getElementById('lbKapasitas').value) || 30;
   const ket  = document.getElementById('lbKeterangan').value.trim();
   if (!nama) { showToast('Nama lab wajib diisi!','error'); return; }
-  db.labs.push({ id:db.labs.length+1, nama, kapasitas:kap, status:'tersedia', keterangan:ket||'-' });
+
+  if (editId > 0) {
+    const item = db.labs.find(l => l.id === editId);
+    if (item) { item.nama = nama; item.kapasitas = kap; item.keterangan = ket || '-'; }
+    showToast('Data lab berhasil diperbarui!');
+  } else {
+    db.labs.push({ id:db.labs.length+1, nama, kapasitas:kap, status:'tersedia', keterangan:ket||'-' });
+    showToast('Lab berhasil ditambahkan!');
+  }
+  saveDB();
   closeModal('modalLab');
   renderLab();
-  showToast('Lab berhasil ditambahkan!');
 }
+
 function deleteLab(id) {
   if (!confirm('Hapus lab ini?')) return;
   db.labs = db.labs.filter(l => l.id!==id);
+  saveDB();
   renderLab();
   showToast('Lab dihapus.','error');
 }
@@ -516,7 +762,7 @@ function renderJadwalAdmin() {
   el.innerHTML =
     '<div class="view-header"><div><h1 class="view-title">Data Jadwal</h1>' +
     '<p class="view-desc">Jadwal praktikum per ASLAB. Dibuat oleh Laboran, 8 pertemuan per mata kuliah.</p></div>' +
-    '<button class="btn btn-primary" onclick="openModal(\'modalJadwal\')">+ Tambah Jadwal</button></div>' +
+    '<button class="btn btn-primary" onclick="openJadwalModal()">+ Tambah Jadwal</button></div>' +
     '<div class="filter-toolbar mb-4">' +
     '<div class="filter-group"><span class="filter-label">Filter ASLAB:</span>' +
     '<select id="filterJadwalAslab" class="form-select" onchange="renderJadwalAdminTable()">' +
@@ -544,10 +790,40 @@ function renderJadwalAdminTable() {
       '<td>' + j.lab + '</td><td><span class="pill-tag">Pertemuan ' + j.pertemuan + '</span></td>' +
       '<td>' + formatTanggal(j.tanggal) + '</td><td>' + j.jamMulai + ' - ' + j.jamSelesai + '</td>' +
       '<td style="font-size:12px;color:var(--text-muted);">' + j.materi + '</td>' +
-      '<td><button class="btn btn-xs btn-danger" onclick="deleteJadwal(' + j.id + ')">🗑 Hapus</button></td></tr>').join('');
+      '<td><button class="btn btn-xs btn-outline me-1" onclick="editJadwal(' + j.id + ')">✏️ Edit</button>' +
+      '<button class="btn btn-xs btn-danger" onclick="deleteJadwal(' + j.id + ')">🗑 Hapus</button></td></tr>').join('');
+}
+
+function openJadwalModal() {
+  document.getElementById('jdEditId').value = -1;
+  document.getElementById('jdTanggal').value = toDateString(new Date());
+  document.getElementById('jdJamMulai').value = '08:00';
+  document.getElementById('jdJamSelesai').value = '10:00';
+  document.getElementById('jdMateri').value = '';
+  document.getElementById('modalJadwalTitle').textContent = '📅 Tambah Jadwal Praktikum';
+  populateJadwalModalSelects();
+  openModal('modalJadwal');
+}
+
+function editJadwal(id) {
+  const j = db.jadwal.find(x => x.id === id);
+  if (!j) return;
+  populateJadwalModalSelects();
+  document.getElementById('jdEditId').value = j.id;
+  document.getElementById('jdMatkul').value = j.matkul;
+  document.getElementById('jdAslab').value = j.aslab;
+  document.getElementById('jdLab').value = j.lab;
+  document.getElementById('jdPertemuan').value = j.pertemuan;
+  document.getElementById('jdTanggal').value = j.tanggal;
+  document.getElementById('jdJamMulai').value = j.jamMulai;
+  document.getElementById('jdJamSelesai').value = j.jamSelesai;
+  document.getElementById('jdMateri').value = j.materi;
+  document.getElementById('modalJadwalTitle').textContent = '✏️ Edit Jadwal Praktikum';
+  openModal('modalJadwal');
 }
 
 function addJadwal() {
+  const editId  = parseInt(document.getElementById('jdEditId').value) || -1;
   const matkul  = document.getElementById('jdMatkul').value;
   const aslab   = document.getElementById('jdAslab').value;
   const lab     = document.getElementById('jdLab').value;
@@ -557,14 +833,27 @@ function addJadwal() {
   const jSelesai= document.getElementById('jdJamSelesai').value;
   const materi  = document.getElementById('jdMateri').value.trim();
   if (!matkul||!aslab||!tanggal||!jMulai||!jSelesai) { showToast('Semua field wajib diisi!','error'); return; }
-  db.jadwal.push({ id:counters.jadwal++, matkul, aslab, lab, pertemuan:pert, tanggal, jamMulai:jMulai, jamSelesai:jSelesai, materi:materi||'Materi Praktikum' });
+
+  if (editId > 0) {
+    const item = db.jadwal.find(j => j.id === editId);
+    if (item) {
+      item.matkul = matkul; item.aslab = aslab; item.lab = lab; item.pertemuan = pert;
+      item.tanggal = tanggal; item.jamMulai = jMulai; item.jamSelesai = jSelesai; item.materi = materi || 'Materi Praktikum';
+    }
+    showToast('Jadwal berhasil diperbarui!');
+  } else {
+    db.jadwal.push({ id:counters.jadwal++, matkul, aslab, lab, pertemuan:pert, tanggal, jamMulai:jMulai, jamSelesai:jSelesai, materi:materi||'Materi Praktikum' });
+    showToast('Jadwal berhasil ditambahkan!');
+  }
+  saveDB();
   closeModal('modalJadwal');
   renderJadwalAdmin();
-  showToast('Jadwal berhasil ditambahkan!');
 }
+
 function deleteJadwal(id) {
   if (!confirm('Hapus jadwal ini?')) return;
   db.jadwal = db.jadwal.filter(j => j.id !== id);
+  saveDB();
   renderJadwalAdminTable();
   showToast('Jadwal dihapus.','error');
 }
@@ -578,13 +867,14 @@ function renderModulAdmin() {
   el.innerHTML =
     '<div class="view-header"><div><h1 class="view-title">Modul Praktikum</h1>' +
     '<p class="view-desc">Modul yang disiapkan Laboran. ASLAB tinggal menggunakannya.</p></div>' +
-    '<button class="btn btn-primary" onclick="openModal(\'modalModul\')">+ Tambah Modul</button></div>' +
+    '<button class="btn btn-primary" onclick="openModulModal()">+ Tambah Modul</button></div>' +
     '<div class="filter-toolbar mb-4"><div class="filter-group"><span class="filter-label">Filter Matkul:</span>' +
     '<select id="filterModulAdminMk" class="form-select" onchange="renderModulAdminGrid()">' +
     '<option value="">Semua Matkul</option>' + db.matkul.map(m => '<option>' + m.nama + '</option>').join('') +
     '</select></div></div><div class="modul-grid" id="modulAdminGrid"></div>';
   renderModulAdminGrid();
 }
+
 function renderModulAdminGrid() {
   const f = document.getElementById('filterModulAdminMk')?.value || '';
   const grid = document.getElementById('modulAdminGrid');
@@ -599,9 +889,17 @@ function renderModulAdminGrid() {
       '<div class="modul-title">' + m.judul + '</div>' +
       '<div class="modul-sub">📚 ' + m.matkul + ' - Pertemuan ' + m.pertemuan + '</div>' +
       '<div class="modul-desc">' + m.deskripsi + '</div>' +
-      '<button class="btn btn-xs btn-outline mt-3" onclick="showToast(\'Mengunduh modul...\')">📥 Unduh PDF</button></div>'
+      '<button class="btn btn-xs btn-outline mt-3" onclick="downloadModul(' + m.id + ')">📥 Unduh Modul</button></div>'
     ).join('');
 }
+
+function openModulModal() {
+  document.getElementById('mdJudul').value = '';
+  document.getElementById('mdDeskripsi').value = '';
+  populateJadwalModalSelects();
+  openModal('modalModul');
+}
+
 function addModul() {
   const judul = document.getElementById('mdJudul').value.trim();
   const matkul= document.getElementById('mdMatkul').value;
@@ -609,15 +907,67 @@ function addModul() {
   const desk  = document.getElementById('mdDeskripsi').value.trim() || 'Tidak ada deskripsi.';
   if (!judul) { showToast('Judul modul wajib diisi!','error'); return; }
   db.modul.push({ id:counters.modul++, judul, matkul, pertemuan:pert, deskripsi:desk });
+  saveDB();
   closeModal('modalModul');
   renderModulAdmin();
   showToast('Modul berhasil ditambahkan!');
 }
+
 function deleteModul(id) {
   if (!confirm('Hapus modul ini?')) return;
   db.modul = db.modul.filter(m => m.id !== id);
+  saveDB();
   renderModulAdminGrid();
   showToast('Modul dihapus.','error');
+}
+
+function downloadModul(id) {
+  const m = db.modul.find(item => item.id === id);
+  if (!m) return;
+  const content = `========================================================================
+UNIVERSITAS ISLAM RIAU (UIR) PEKANBARU
+FAKULTAS TEKNIK - PROGRAM STUDI TEKNIK INFORMATIKA
+SILAB UIR — DOKUMEN RESMI MODUL PRAKTIKUM LABORATORIUM KOMPUTER
+========================================================================
+
+KODE / MATA KULIAH : ${m.matkul}
+PERTEMUAN          : Pertemuan ke-${m.pertemuan}
+JUDUL MODUL        : ${m.judul}
+STATUS             : Terverifikasi oleh Laboran & Dosen Pengampu
+
+------------------------------------------------------------------------
+DESKRIPSI & MATERI PRAKTIKUM
+------------------------------------------------------------------------
+${m.deskripsi}
+
+PETUNJUK UMUM PRAKTIKAN:
+1. Mahasiswa wajib hadir di ruang laboratorium 10 menit sebelum praktikum dimulai.
+2. Setiap mahasiswa menempati workstation PC sesuai nomor urut yang ditentukan.
+3. Kerjakan langkah-langkah praktikum secara bertahap dan simpan pekerjaan di repositori lokal.
+4. Konsultasikan kendala teknis kepada ASLAB yang bertugas.
+5. Tugas akhir pertemuan dikumpulkan maksimal 2 hari sebelum pertemuan berikutnya.
+
+STANDAR KESELAMATAN & KETERTIBAN LAB:
+- Dilarang membawa makanan dan minuman ke dalam ruang lab komputer.
+- Harap menjaga kebersihan dan kerapian perangkat setelah sesi praktikum selesai.
+- Lakukan shutdown workstation PC setelah praktikum berakhir.
+
+========================================================================
+Dokumen diterbitkan secara otomatis oleh Sistem Informasi Laboratorium (SILAB UIR)
+Tanggal Unduh : ${new Date().toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'})}
+Waktu         : ${formatTimeDisplay(new Date())} WIB
+========================================================================`;
+
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Modul_${m.matkul.replace(/\s+/g, '_')}_Pertemuan_${m.pertemuan}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Dokumen modul ' + m.judul + ' berhasil diunduh!');
 }
 
 // ============================================================
@@ -769,7 +1119,7 @@ function renderInventaris() {
   el.innerHTML =
     '<div class="view-header"><div><h1 class="view-title">Inventaris</h1>' +
     '<p class="view-desc">Pencatatan aset dan perangkat laboratorium.</p></div>' +
-    '<button class="btn btn-primary" onclick="openModal(\'modalInventaris\')">+ Tambah Aset</button></div>' +
+    '<button class="btn btn-primary" onclick="openInventarisModal()">+ Tambah Aset</button></div>' +
     '<div class="metrics-grid mb-4">' +
     metricCard('cyan','🖥️', tot + ' Unit', 'Total Aset') +
     metricCard('emerald','✅', bag + ' Unit', 'Kondisi Bagus') +
@@ -782,6 +1132,7 @@ function renderInventaris() {
     '<tbody id="inventarisBody"></tbody></table></div></div>';
   renderInventarisTable();
 }
+
 function renderInventarisTable() {
   const tbody = document.getElementById('inventarisBody');
   if (!tbody) return;
@@ -791,24 +1142,59 @@ function renderInventarisTable() {
       '<td><span class="pill-tag glow">' + inv.jumlah + ' Unit</span></td>' +
       '<td>' + statusBadge(inv.kondisi) + '</td>' +
       '<td style="font-size:12px;color:var(--text-muted);">' + inv.keterangan + '</td>' +
-      '<td><button class="btn btn-xs btn-danger" onclick="deleteInventaris(' + inv.id + ')">🗑</button></td></tr>').join('');
+      '<td><button class="btn btn-xs btn-outline me-1" onclick="editInventaris(' + inv.id + ')">✏️</button>' +
+      '<button class="btn btn-xs btn-danger" onclick="deleteInventaris(' + inv.id + ')">🗑</button></td></tr>').join('');
 }
+
+function openInventarisModal() {
+  document.getElementById('invEditId').value = -1;
+  document.getElementById('invNama').value = '';
+  document.getElementById('invJumlah').value = 1;
+  document.getElementById('invKeterangan').value = '';
+  document.getElementById('modalInventarisTitle').textContent = '💻 Tambah Aset Inventaris';
+  openModal('modalInventaris');
+}
+
+function editInventaris(id) {
+  const inv = db.inventaris.find(x => x.id === id);
+  if (!inv) return;
+  document.getElementById('invEditId').value = inv.id;
+  document.getElementById('invNama').value = inv.nama;
+  document.getElementById('invLab').value = inv.lab;
+  document.getElementById('invJumlah').value = inv.jumlah;
+  document.getElementById('invKondisi').value = inv.kondisi;
+  document.getElementById('invKeterangan').value = inv.keterangan === '-' ? '' : inv.keterangan;
+  document.getElementById('modalInventarisTitle').textContent = '✏️ Edit Aset Inventaris';
+  openModal('modalInventaris');
+}
+
 function addInventaris() {
+  const editId = parseInt(document.getElementById('invEditId').value) || -1;
   const nama   = document.getElementById('invNama').value.trim();
   const lab    = document.getElementById('invLab').value;
   const jumlah = parseInt(document.getElementById('invJumlah').value) || 1;
   const kondisi= document.getElementById('invKondisi').value;
   const ket    = document.getElementById('invKeterangan').value.trim() || '-';
   if (!nama) { showToast('Nama perangkat wajib diisi!','error'); return; }
-  const kode = 'INV-' + lab.replace(' ','') + '-' + String(counters.inventaris).padStart(3,'0');
-  db.inventaris.push({ id:counters.inventaris++, kode, nama, lab, jumlah, kondisi, keterangan:ket });
+
+  if (editId > 0) {
+    const item = db.inventaris.find(i => i.id === editId);
+    if (item) { item.nama = nama; item.lab = lab; item.jumlah = jumlah; item.kondisi = kondisi; item.keterangan = ket; }
+    showToast('Aset inventaris berhasil diperbarui!');
+  } else {
+    const kode = 'INV-' + lab.replace(' ','') + '-' + String(counters.inventaris).padStart(3,'0');
+    db.inventaris.push({ id:counters.inventaris++, kode, nama, lab, jumlah, kondisi, keterangan:ket });
+    showToast('Aset berhasil ditambahkan!');
+  }
+  saveDB();
   closeModal('modalInventaris');
   renderInventaris();
-  showToast('Aset berhasil ditambahkan!');
 }
+
 function deleteInventaris(id) {
   if (!confirm('Hapus aset inventaris ini?')) return;
   db.inventaris = db.inventaris.filter(i => i.id!==id);
+  saveDB();
   renderInventarisTable();
   showToast('Aset dihapus.','error');
 }
@@ -849,7 +1235,7 @@ function renderJadwalAslab() {
 }
 
 // ============================================================
-// ASLAB - ABSENSI (TIME-GATED)
+// ASLAB - ABSENSI (TIME-GATED & TESTABLE)
 // ============================================================
 function renderAbsensiAslab() {
   const el = document.getElementById('page-absensi-aslab');
@@ -861,10 +1247,15 @@ function renderAbsensiAslab() {
 
   let html =
     '<div class="view-header"><div><h1 class="view-title">Absensi Saya</h1>' +
-    '<p class="view-desc">Klik tombol <strong>ABSEN</strong> saat jam praktikum dimulai. Sistem otomatis cek waktu.</p></div></div>' +
+    '<p class="view-desc">Klik tombol <strong>ABSEN</strong> saat jam praktikum dimulai. Sistem otomatis memvalidasi hari dan jam.</p></div>' +
+    '<button class="btn btn-outline" onclick="tambahJadwalHariIni()">➕ Buat Sesi Praktikum Hari Ini</button></div>' +
     '<div class="glass-card mb-4" style="background:rgba(255,200,0,0.05);border:1px solid rgba(255,200,0,0.25);padding:14px 18px;">' +
     '<span style="font-size:13px;">⏰ <strong>Waktu Sekarang:</strong> ' + formatTimeDisplay(now) + ' WIB — ' + formatTanggal(todayStr) +
-    '<br><small style="color:var(--text-muted);">Absensi hanya bisa dilakukan saat sudah memasuki waktu jadwal.</small></span></div>';
+    '<br><small style="color:var(--text-muted);">Absensi hanya bisa dilakukan saat sudah memasuki waktu jadwal.</small></span></div>' +
+    '<div class="glass-card mb-4" style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.3);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">' +
+    '<div><div style="font-weight:700;color:var(--emerald);font-size:13.5px;">⚡ Mode Pengujian Dosen: Tombol Presensi Hari Ini Aktif</div>' +
+    '<div style="font-size:12px;color:var(--text-muted);margin-top:3px;">Sesi praktikum untuk hari ini (<strong>' + formatTanggal(todayStr) + '</strong>) sudah disiapkan. Anda dapat langsung menguji klik tombol <strong>✅ ABSEN</strong>.</div></div>' +
+    '<button class="btn btn-xs btn-primary" onclick="tambahJadwalHariIni()">➕ Tambah Sesi Uji Coba Baru</button></div>';
 
   currentUser.matkul.forEach(mk => {
     const jMk = myJ.filter(j => j.matkul===mk);
@@ -878,7 +1269,8 @@ function renderAbsensiAslab() {
         const bisaAbsen = isToday && !abs && isWaktuAbsen(j.jamMulai, now);
         let statusHtml = '';
         if (abs) {
-          statusHtml = '<span class="badge-status tersedia">✅ Sudah Absen (' + abs.waktuAbsen + ' WIB)</span>';
+          statusHtml = '<span class="badge-status tersedia">✅ Sudah Absen (' + abs.waktuAbsen + ' WIB)</span> ' +
+            '<button class="btn btn-xs btn-outline" style="font-size:11px;margin-left:6px;" onclick="batalAbsen(' + abs.id + ')" title="Reset status untuk uji coba tombol lagi">↺ Uji Ulang</button>';
         } else if (!isToday) {
           const tgl = new Date(j.tanggal + 'T00:00:00');
           statusHtml = tgl < now ?
@@ -899,7 +1291,7 @@ function renderAbsensiAslab() {
           (bisaAbsen ?
             '<button class="btn btn-primary btn-absen" onclick="doAbsen(' + j.id + ')">✅ ABSEN</button>' :
             abs ?
-            '<button class="btn btn-sm" disabled style="background:rgba(0,230,118,0.15);color:var(--emerald);cursor:not-allowed;">☑️ Selesai</button>' :
+            '<button class="btn btn-sm" onclick="batalAbsen(' + abs.id + ')" style="background:rgba(0,230,118,0.15);color:var(--emerald);cursor:pointer;" title="Klik untuk reset dan coba absen lagi">☑️ Selesai (Klik Uji Ulang)</button>' :
             '<button class="btn btn-sm" disabled style="background:rgba(255,255,255,0.05);color:var(--text-muted);cursor:not-allowed;">🔒 Belum Waktunya</button>'
           ) + '</div></div>';
       });
@@ -921,8 +1313,41 @@ function doAbsen(jadwalId) {
   const waktuAbsen = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
   db.absensi.push({ id:counters.absensi++, jadwalId, aslab:currentUser.nama, matkul:jadwal.matkul,
     pertemuan:jadwal.pertemuan, tanggal:jadwal.tanggal, waktuAbsen, status:'Hadir' });
+  saveDB();
   showToast('✅ Absensi Pertemuan ' + jadwal.pertemuan + ' (' + jadwal.matkul + ') berhasil!','success');
   renderAbsensiAslab();
+}
+
+function batalAbsen(absId) {
+  if (!confirm('Reset status absensi ini agar Anda dapat menguji tombol ABSEN kembali?')) return;
+  db.absensi = db.absensi.filter(a => a.id !== absId);
+  saveDB();
+  renderAbsensiAslab();
+  showToast('Status absensi berhasil di-reset untuk uji coba ulang.');
+}
+
+function tambahJadwalHariIni() {
+  const now = new Date();
+  const todayStr = toDateString(now);
+  const mk = (currentUser && currentUser.matkul && currentUser.matkul[0]) ? currentUser.matkul[0] : 'Pemrograman Web';
+  const lab = (currentUser && currentUser.lab) ? currentUser.lab : 'Lab 1';
+  const count = db.jadwal.filter(j => j.aslab === currentUser.nama && j.matkul === mk).length;
+  const pert = (count % 8) + 1;
+  const newJadwal = {
+    id: counters.jadwal++,
+    matkul: mk,
+    aslab: currentUser.nama,
+    lab: lab,
+    pertemuan: pert,
+    tanggal: todayStr,
+    jamMulai: '07:00',
+    jamSelesai: '23:59',
+    materi: 'Sesi Uji Coba Presensi Praktikum (' + formatTanggal(todayStr) + ')'
+  };
+  db.jadwal.unshift(newJadwal);
+  saveDB();
+  renderAbsensiAslab();
+  showToast('Sesi praktikum hari ini berhasil ditambahkan! Tombol ABSEN aktif.');
 }
 
 // ============================================================
@@ -949,7 +1374,7 @@ function renderModulAslab() {
           '<div class="modul-title">' + mod.judul + '</div>' +
           '<div class="modul-sub">Pertemuan ' + mod.pertemuan + '</div>' +
           '<div class="modul-desc">' + mod.deskripsi + '</div>' +
-          '<button class="btn btn-xs btn-outline mt-3" onclick="showToast(\'Mengunduh modul...\')">📥 Unduh PDF</button></div>';
+          '<button class="btn btn-xs btn-outline mt-3" onclick="downloadModul(' + mod.id + ')">📥 Unduh Modul</button></div>';
       });
     }
     html += '</div></div>';
@@ -1050,6 +1475,7 @@ function saveNilai() {
     db.nilai.push({ id:counters.nilai++, nim, nama, matkul, aslab:currentUser.nama, nilaiTugas:nt, nilaiUjian:nu });
     showToast('Nilai '+nama+' berhasil ditambahkan!');
   }
+  saveDB();
   closeModal('modalNilai');
   renderNilai();
 }
@@ -1072,6 +1498,7 @@ function editNilai(id) {
 function deleteNilai(id) {
   if (!confirm('Hapus data nilai ini?')) return;
   db.nilai=db.nilai.filter(n=>n.id!==id);
+  saveDB();
   renderNilai();
   showToast('Nilai dihapus.','error');
 }
@@ -1249,6 +1676,7 @@ function confirmImportNilai() {
     if (item) { item.nama = r.nama; item.nilaiTugas = r.nilaiTugas; item.nilaiUjian = r.nilaiUjian; updated++; }
     else { db.nilai.push({ id: counters.nilai++, nim: r.nim, nama: r.nama, matkul: r.matkul, aslab: currentUser.nama, nilaiTugas: r.nilaiTugas, nilaiUjian: r.nilaiUjian }); added++; }
   });
+  saveDB();
   closeModal('modalImportNilai');
   renderNilai();
   showToast('Import selesai: ' + added + ' data baru, ' + updated + ' diperbarui.');
@@ -1328,8 +1756,14 @@ setInterval(updateClock,1000);
 updateClock();
 
 function toggleSidebar() {
-  document.getElementById('sidebar')?.classList.toggle('collapsed');
-  document.getElementById('mainContent')?.classList.toggle('expanded');
+  const sb = document.getElementById('sidebar');
+  const mc = document.getElementById('mainContent');
+  if (window.innerWidth <= 768) {
+    sb?.classList.toggle('mobile-open');
+  } else {
+    sb?.classList.toggle('collapsed');
+    mc?.classList.toggle('expanded');
+  }
 }
 
 // populate jadwal modal selects
@@ -1345,7 +1779,15 @@ function populateJadwalModalSelects() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('view-login-admin').classList.add('active-view');
+  // Muat data dari localStorage jika pernah disimpan
+  loadDB();
+
+  // Coba pulihkan sesi aktif (jika pengguna me-refresh halaman)
+  const restored = restoreSession();
+  if (!restored) {
+    document.getElementById('view-login-admin').classList.add('active-view');
+  }
+
   // Override openModal to also populate selects
   const _openModal = openModal;
   window.openModal = function(id) {

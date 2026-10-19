@@ -2692,3 +2692,48 @@ textarea.form-control {
 .import-table-wrap .custom-table { font-size: 12px; }
 .import-table-wrap tr.row-error td { opacity: 0.6; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ===== RESPONSIVE MEDIA QUERIES ===== */
+@media (max-width: 992px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .form-row-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-w: 260px;
+  }
+  .sidebar {
+    transform: translateX(-100%);
+    box-shadow: 0 0 40px rgba(0,0,0,0.8);
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .main-wrapper {
+    margin-left: 0 !important;
+  }
+  .topbar {
+    padding: 0 16px;
+  }
+  .topbar-right .system-status-pill {
+    display: none;
+  }
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-row-2 {
+    grid-template-columns: 1fr;
+  }
+  .modal-card {
+    max-width: 95vw;
+    margin: 10px;
+  }
+  .auth-wrapper {
+    padding: 16px;
+  }
+}

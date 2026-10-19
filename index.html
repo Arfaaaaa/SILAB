@@ -46,6 +46,12 @@
           <span>&#128737; MASUK CONTROL CENTER LABORAN</span>
         </button>
       </form>
+      <div class="quick-preset-box mt-3">
+        <span class="preset-label">&#9889; DEMO PENGUJIAN (KLIK LANGSUNG MASUK):</span>
+        <div class="preset-buttons">
+          <button type="button" class="btn-preset-chip" onclick="quickFillAdmin()">&#128737; Masuk Otomatis sbg Laboran (Admin)</button>
+        </div>
+      </div>
       <div class="auth-footer-switch">
         <span>Bukan Laboran / Admin?</span>
         <button type="button" class="switch-link-btn" onclick="switchToAslabLogin()">&#127891; Login Portal ASLAB &rarr;</button>
@@ -84,6 +90,16 @@
           <span>&#128640; MASUK PORTAL ASLAB</span>
         </button>
       </form>
+      <div class="quick-preset-box mt-3">
+        <span class="preset-label">&#9889; DEMO PENGUJIAN (PILIH AKUN ASLAB):</span>
+        <div class="preset-buttons">
+          <button type="button" class="btn-preset-chip" onclick="quickFillAslab('andi','andi123')">&#128100; Andi (Web &amp; AI)</button>
+          <button type="button" class="btn-preset-chip" onclick="quickFillAslab('budi','budi123')">&#128100; Budi (Basis Data)</button>
+          <button type="button" class="btn-preset-chip" onclick="quickFillAslab('citra','citra123')">&#128100; Citra (Jaringan)</button>
+          <button type="button" class="btn-preset-chip" onclick="quickFillAslab('dian','dian123')">&#128100; Dian (Mobile)</button>
+          <button type="button" class="btn-preset-chip" onclick="quickFillAslab('eko','eko123')">&#128100; Eko (AI &amp; DB)</button>
+        </div>
+      </div>
       <div class="auth-footer-switch">
         <span>Laboran / Pengelola Lab?</span>
         <button type="button" class="switch-link-btn" onclick="switchToAdminLogin()">&#128737; Switch ke Portal Laboran &rarr;</button>
@@ -150,6 +166,9 @@
           <span>SILAB UIR Aktif</span>
         </div>
         <div class="clock-badge" id="timeDisplay">00:00:00</div>
+        <button class="btn btn-xs btn-outline" onclick="resetDataWithConfirm()" title="Reset data demo ke awal bawaan" style="border-color:rgba(255,255,255,0.18); font-size:11.5px; padding: 6px 10px;">
+          <span>&#128259; Reset Data Demo</span>
+        </button>
         <button class="btn btn-login-top" onclick="logoutToLoginScreen()">
           <span>&#128682; Logout</span>
         </button>
@@ -180,9 +199,10 @@
 <!-- Modal Mata Kuliah -->
 <div class="modal-overlay" id="modalMatkul">
   <div class="modal-card">
-    <div class="modal-header"><h3>&#128218; Tambah Mata Kuliah</h3>
+    <div class="modal-header"><h3 id="modalMatkulTitle">&#128218; Tambah Mata Kuliah</h3>
     <button class="modal-close" onclick="closeModal('modalMatkul')">&#10005;</button></div>
     <div class="modal-body">
+      <input type="hidden" id="mkEditId" value="-1" />
       <div class="form-field"><label>Kode Mata Kuliah *</label><input type="text" id="mkKode" class="form-control" placeholder="IF201" /></div>
       <div class="form-field"><label>Nama Mata Kuliah *</label><input type="text" id="mkNama" class="form-control" placeholder="Pemrograman Web" /></div>
       <div class="form-field"><label>SKS</label><input type="number" id="mkSks" class="form-control" value="3" min="1" max="6" /></div>
@@ -198,9 +218,10 @@
 <!-- Modal ASLAB -->
 <div class="modal-overlay" id="modalAslab">
   <div class="modal-card">
-    <div class="modal-header"><h3>&#128104;&#8205;&#127979; Tambah Data ASLAB</h3>
+    <div class="modal-header"><h3 id="modalAslabTitle">&#128104;&#8205;&#127979; Tambah Data ASLAB</h3>
     <button class="modal-close" onclick="closeModal('modalAslab')">&#10005;</button></div>
     <div class="modal-body">
+      <input type="hidden" id="asEditId" value="-1" />
       <div class="form-field"><label>NIM / ID ASLAB *</label><input type="text" id="asNim" class="form-control" placeholder="ASLAB006" /></div>
       <div class="form-field"><label>Nama Lengkap *</label><input type="text" id="asNama" class="form-control" placeholder="Nama Lengkap" /></div>
       <div class="form-field"><label>Username Login *</label><input type="text" id="asUsername" class="form-control" placeholder="username (tanpa spasi)" /></div>
@@ -223,9 +244,10 @@
 <!-- Modal Laboratorium -->
 <div class="modal-overlay" id="modalLab">
   <div class="modal-card">
-    <div class="modal-header"><h3>&#127963; Tambah Laboratorium</h3>
+    <div class="modal-header"><h3 id="modalLabTitle">&#127963; Tambah Laboratorium</h3>
     <button class="modal-close" onclick="closeModal('modalLab')">&#10005;</button></div>
     <div class="modal-body">
+      <input type="hidden" id="lbEditId" value="-1" />
       <div class="form-field"><label>Nama Lab *</label><input type="text" id="lbNama" class="form-control" placeholder="Lab 6" /></div>
       <div class="form-field"><label>Kapasitas (PC)</label><input type="number" id="lbKapasitas" class="form-control" value="30" /></div>
       <div class="form-field"><label>Keterangan</label><input type="text" id="lbKeterangan" class="form-control" placeholder="Fungsi lab ini" /></div>
@@ -240,9 +262,10 @@
 <!-- Modal Jadwal -->
 <div class="modal-overlay" id="modalJadwal">
   <div class="modal-card modal-wide">
-    <div class="modal-header"><h3>&#128197; Tambah Jadwal Praktikum</h3>
+    <div class="modal-header"><h3 id="modalJadwalTitle">&#128197; Tambah Jadwal Praktikum</h3>
     <button class="modal-close" onclick="closeModal('modalJadwal')">&#10005;</button></div>
     <div class="modal-body">
+      <input type="hidden" id="jdEditId" value="-1" />
       <div class="form-row-2">
         <div class="form-field"><label>Mata Kuliah *</label><select id="jdMatkul" class="form-control form-select"></select></div>
         <div class="form-field"><label>ASLAB Pengampu *</label><select id="jdAslab" class="form-control form-select"></select></div>
@@ -359,9 +382,10 @@
 <!-- Modal Inventaris -->
 <div class="modal-overlay" id="modalInventaris">
   <div class="modal-card">
-    <div class="modal-header"><h3>&#128187; Tambah Aset Inventaris</h3>
+    <div class="modal-header"><h3 id="modalInventarisTitle">&#128187; Tambah Aset Inventaris</h3>
     <button class="modal-close" onclick="closeModal('modalInventaris')">&#10005;</button></div>
     <div class="modal-body">
+      <input type="hidden" id="invEditId" value="-1" />
       <div class="form-field"><label>Nama Perangkat *</label><input type="text" id="invNama" class="form-control" placeholder="PC Workstation Core i7" /></div>
       <div class="form-row-2">
         <div class="form-field"><label>Laboratorium</label>
