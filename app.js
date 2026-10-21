@@ -5,6 +5,9 @@
    =================================================================== */
 
 let db = {
+  admins: [
+    { id:1, nip:'198705152010121002', nama:'Laboran Utama FT', username:'admin_uir', password:'admin123', pin:'8891' }
+  ],
   aslab: [
     { id:1, nim:'ASLAB001', nama:'Andi Prasetyo',  username:'andi',  password:'andi123',  matkul:['Pemrograman Web','Kecerdasan Buatan'], lab:'Lab 1', contact:'0812-7654-3210', status:'Aktif' },
     { id:2, nim:'ASLAB002', nama:'Budi Hermawan',  username:'budi',  password:'budi123',  matkul:['Basis Data'],                          lab:'Lab 2', contact:'0813-9876-5432', status:'Aktif' },
@@ -157,6 +160,11 @@ function loadDB() {
     const rawCounters = localStorage.getItem('silab_uir_counters');
     if (rawDB) {
       db = JSON.parse(rawDB);
+      if (!db.admins || !Array.isArray(db.admins) || db.admins.length === 0) {
+        db.admins = [
+          { id:1, nip:'198705152010121002', nama:'Laboran Utama FT', username:'admin_uir', password:'admin123', pin:'8891' }
+        ];
+      }
     } else {
       ensureTestScheduleForToday();
       saveDB();
@@ -219,6 +227,17 @@ function restoreSession() {
     if (!raw) return false;
     const session = JSON.parse(raw);
     if (!session || !session.role || !session.user) return false;
+
+    // Bersihkan sesi jika role admin tapi user adalah akun ASLAB
+    if (session.role === 'admin' && session.user) {
+      const uName = (session.user.username || session.user.nama || '').toLowerCase();
+      const isAslab = db.aslab && db.aslab.some(a => a.username.toLowerCase() === uName);
+      if (isAslab) {
+        clearSession();
+        return false;
+      }
+    }
+
     currentRole = session.role;
     currentUser = session.user;
 
@@ -265,29 +284,69 @@ function handleAdminAuth() {
   const pass = document.getElementById('adminPass').value.trim();
   const pin  = document.getElementById('adminPin').value.trim();
   if (!user || !pass || !pin) { showToast('Semua field wajib diisi!','error'); return; }
-  if (pin !== '8891') { showToast('PIN Otorisasi salah! (Gunakan 8891)','error'); return; }
+
+  // 1. Blokir akun ASLAB yang mencoba login di Portal Laboran
+  const aslabFound = db.aslab && db.aslab.find(a => a.username.toLowerCase() === user.toLowerCase());
+  if (aslabFound) {
+    showToast('Akses Ditolak! Akun "' + user + '" (' + aslabFound.nama + ') adalah Asisten Laboratorium (ASLAB), bukan Laboran. Silakan gunakan Portal Login ASLAB.', 'error');
+    return;
+  }
+
+  // 2. Validasi PIN Otorisasi Khusus Laboran
+  if (pin !== '8891') { 
+    showToast('PIN Otorisasi salah! (Gunakan 8891)', 'error'); 
+    return; 
+  }
+
+  // 3. Validasi Kredensial Resmi Laboran / Admin
+  const adminList = (db.admins && db.admins.length > 0) ? db.admins : [
+    { username: 'admin_uir', password: 'admin123', nama: 'Laboran Utama FT', nip: '198705152010121002' }
+  ];
+  const foundAdmin = adminList.find(a => a.username.toLowerCase() === user.toLowerCase() && a.password === pass);
+
+  if (!foundAdmin) {
+    showToast('NIP / Username atau Kata Sandi Laboran salah!', 'error');
+    return;
+  }
+
   currentRole = 'admin';
-  currentUser = { nama: user, role: 'admin' };
+  currentUser = { 
+    nama: foundAdmin.nama || 'Laboran FT UIR', 
+    username: foundAdmin.username, 
+    nip: foundAdmin.nip || '198705152010121002',
+    role: 'admin' 
+  };
   saveSession('admin', currentUser, 'dashboard');
   document.getElementById('view-login-admin').classList.remove('active-view');
   document.getElementById('app-dashboard-container').classList.remove('hidden');
   document.getElementById('currentRoleText').textContent = 'Laboran (Admin)';
   document.getElementById('roleDot').style.background = 'var(--emerald)';
-  document.getElementById('userName').textContent = user;
+  document.getElementById('userName').textContent = currentUser.nama;
   document.getElementById('userEmail').textContent = 'laboran.admin@uir.ac.id';
-  document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
+  document.getElementById('userAvatar').textContent = currentUser.nama.charAt(0).toUpperCase();
   buildAdminSidebar();
   navigateTo('dashboard');
-  showToast('Selamat datang, ' + user + '! Control Center Laboran aktif.', 'success');
+  showToast('Selamat datang, ' + currentUser.nama + '! Control Center Laboran aktif.', 'success');
 }
 
 function handleAslabAuth() {
   const username = document.getElementById('aslabUsername').value.trim();
   const password = document.getElementById('aslabPassword').value.trim();
   if (!username || !password) { showToast('Username dan password wajib diisi!','error'); return; }
-  const found = db.aslab.find(a => a.username === username && a.password === password);
-  if (!found) { showToast('Username atau password salah!','error'); return; }
+
+  // 1. Blokir akun Admin/Laboran yang mencoba login di Portal ASLAB
+  const adminList = (db.admins && db.admins.length > 0) ? db.admins : [{ username: 'admin_uir' }];
+  const isAdmin = adminList.some(adm => adm.username.toLowerCase() === username.toLowerCase());
+  if (isAdmin) {
+    showToast('Akun "' + username + '" adalah akun Laboran/Admin! Silakan gunakan Portal Login Laboran.', 'error');
+    return;
+  }
+
+  // 2. Validasi Akun ASLAB
+  const found = db.aslab.find(a => a.username.toLowerCase() === username.toLowerCase() && a.password === password);
+  if (!found) { showToast('Username atau password ASLAB salah!','error'); return; }
   if (found.status !== 'Aktif') { showToast('Akun ASLAB tidak aktif. Hubungi Laboran.','error'); return; }
+
   currentRole = 'aslab';
   currentUser = found;
   saveSession('aslab', currentUser, 'dashboard');
@@ -381,6 +440,18 @@ function navItem(page, icon, label, tag) {
 // NAVIGATION
 // ============================================================
 function navigateTo(pageId) {
+  // Proteksi Hak Akses (Route Guard)
+  const adminOnlyPages = ['matkul', 'aslab', 'lab', 'jadwal', 'modul-admin', 'absensi-admin', 'rekap', 'monitoring', 'inventaris'];
+  const aslabOnlyPages = ['jadwal-aslab', 'absensi-aslab', 'modul-aslab', 'nilai'];
+
+  if (currentRole === 'aslab' && adminOnlyPages.includes(pageId)) {
+    showToast('Akses Ditolak! Halaman ini hanya dapat diakses oleh Laboran / Admin.', 'error');
+    pageId = 'dashboard';
+  } else if (currentRole === 'admin' && aslabOnlyPages.includes(pageId)) {
+    showToast('Halaman ini khusus untuk tampilan Asisten Laboratorium (ASLAB).', 'warning');
+    pageId = 'dashboard';
+  }
+
   document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   const tp = document.getElementById('page-' + pageId);
