@@ -999,7 +999,7 @@ function renderModulAdminGrid() {
       '<div class="modul-title">' + m.judul + '</div>' +
       '<div class="modul-sub">📚 ' + m.matkul + ' - Pertemuan ' + m.pertemuan + '</div>' +
       '<div class="modul-desc">' + m.deskripsi + '</div>' +
-      '<button class="btn btn-xs btn-outline mt-3" onclick="downloadModul(' + m.id + ')">📥 Unduh Modul</button></div>'
+      '<button class="btn btn-xs btn-outline mt-3" onclick="downloadModul(' + m.id + ')">📄 Unduh PDF Modul</button></div>'
     ).join('');
 }
 
@@ -1034,50 +1034,99 @@ function deleteModul(id) {
 function downloadModul(id) {
   const m = db.modul.find(item => item.id === id);
   if (!m) return;
-  const content = `========================================================================
-UNIVERSITAS ISLAM RIAU (UIR) PEKANBARU
-FAKULTAS TEKNIK - PROGRAM STUDI TEKNIK INFORMATIKA
-SILAB UIR — DOKUMEN RESMI MODUL PRAKTIKUM LABORATORIUM KOMPUTER
-========================================================================
 
-KODE / MATA KULIAH : ${m.matkul}
-PERTEMUAN          : Pertemuan ke-${m.pertemuan}
-JUDUL MODUL        : ${m.judul}
-STATUS             : Terverifikasi oleh Laboran & Dosen Pengampu
+  showToast('Sedang menyiapkan dokumen PDF ' + m.judul + '...');
 
-------------------------------------------------------------------------
-DESKRIPSI & MATERI PRAKTIKUM
-------------------------------------------------------------------------
-${m.deskripsi}
+  if (typeof generateModulHTML !== 'function') {
+    showToast('Modul generator sedang dimuat, silakan coba sesaat lagi.', 'error');
+    return;
+  }
 
-PETUNJUK UMUM PRAKTIKAN:
-1. Mahasiswa wajib hadir di ruang laboratorium 10 menit sebelum praktikum dimulai.
-2. Setiap mahasiswa menempati workstation PC sesuai nomor urut yang ditentukan.
-3. Kerjakan langkah-langkah praktikum secara bertahap dan simpan pekerjaan di repositori lokal.
-4. Konsultasikan kendala teknis kepada ASLAB yang bertugas.
-5. Tugas akhir pertemuan dikumpulkan maksimal 2 hari sebelum pertemuan berikutnya.
+  const htmlContent = generateModulHTML(m);
+  const safeMatkul = m.matkul.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const filename = 'Modul_' + safeMatkul + '_Pertemuan_' + m.pertemuan + '.pdf';
 
-STANDAR KESELAMATAN & KETERTIBAN LAB:
-- Dilarang membawa makanan dan minuman ke dalam ruang lab komputer.
-- Harap menjaga kebersihan dan kerapian perangkat setelah sesi praktikum selesai.
-- Lakukan shutdown workstation PC setelah praktikum berakhir.
+  if (typeof window.html2pdf === 'function') {
+    const container = document.createElement('div');
+    container.id = 'silab-pdf-temp-container';
+    container.style.position = 'fixed';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    container.style.width = '210mm';
+    container.style.background = '#ffffff';
+    container.style.color = '#111827';
+    container.style.zIndex = '-9999';
+    container.innerHTML = htmlContent;
+    document.body.appendChild(container);
 
-========================================================================
-Dokumen diterbitkan secara otomatis oleh Sistem Informasi Laboratorium (SILAB UIR)
-Tanggal Unduh : ${new Date().toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'})}
-Waktu         : ${formatTimeDisplay(new Date())} WIB
-========================================================================`;
+    const opt = {
+      margin:       [10, 10, 10, 10],
+      filename:     filename,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+    };
 
-  const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Modul_${m.matkul.replace(/\s+/g, '_')}_Pertemuan_${m.pertemuan}.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast('Dokumen modul ' + m.judul + ' berhasil diunduh!');
+    window.html2pdf().set(opt).from(container).save().then(() => {
+      if (document.body.contains(container)) {
+        document.body.removeChild(container);
+      }
+      showToast('Modul PDF "' + m.judul + '" berhasil diunduh!');
+    }).catch(err => {
+      console.warn('html2pdf gagal mengekspor langsung, mengalihkan ke mode cetak peramban:', err);
+      if (document.body.contains(container)) {
+        document.body.removeChild(container);
+      }
+      fallbackPrintModul(m, htmlContent);
+    });
+  } else {
+    fallbackPrintModul(m, htmlContent);
+  }
+}
+
+function fallbackPrintModul(m, htmlContent) {
+  const safeMatkul = m.matkul.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const win = window.open('', '_blank', 'width=950,height=800');
+  if (!win) {
+    showToast('Izinkan pop-up peramban untuk mencetak/menyimpan PDF modul.', 'error');
+    return;
+  }
+  win.document.open();
+  win.document.write('<!DOCTYPE html>' +
+'<html lang="id">' +
+'<head>' +
+'  <meta charset="utf-8">' +
+'  <title>Modul_' + safeMatkul + '_Pertemuan_' + m.pertemuan + '</title>' +
+'  <style>' +
+'    @page { size: A4 portrait; margin: 12mm; }' +
+'    body { font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 20px; color: #111827; background: #ffffff; }' +
+'    @media print {' +
+'      body { padding: 0; background: #fff !important; }' +
+'      .no-print-bar { display: none !important; }' +
+'    }' +
+'  </style>' +
+'</head>' +
+'<body>' +
+'  <div class="no-print-bar" style="margin-bottom:18px;padding:12px 16px;background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-family:Segoe UI, sans-serif;">' +
+'    <div>' +
+'      <strong style="color:#065f46;font-size:14px;">🖨️ Dialog Cetak / Simpan PDF Dokumen Modul UIR</strong>' +
+'      <div style="font-size:12px;color:#047857;margin-top:2px;">Pilih opsi tujuan <em>"Save as PDF"</em> pada jendela printer peramban untuk menyimpan sebagai file PDF resmi.</div>' +
+'    </div>' +
+'    <button onclick="window.print()" style="padding:9px 18px;background:#059669;color:#ffffff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">' +
+'      Simpan ke PDF Sekarang' +
+'    </button>' +
+'  </div>' +
+  htmlContent +
+'  <script>' +
+'    setTimeout(function() {' +
+'      window.print();' +
+'    }, 700);' +
+'  </script>' +
+'</body>' +
+'</html>');
+  win.document.close();
+  showToast('Dokumen PDF Modul "' + m.judul + '" dibuka di jendela cetak PDF!');
 }
 
 // ============================================================
@@ -1532,7 +1581,7 @@ function renderModulAslab() {
           '<div class="modul-title">' + mod.judul + '</div>' +
           '<div class="modul-sub">Pertemuan ' + mod.pertemuan + '</div>' +
           '<div class="modul-desc">' + mod.deskripsi + '</div>' +
-          '<button class="btn btn-xs btn-outline mt-3" onclick="downloadModul(' + mod.id + ')">📥 Unduh Modul</button></div>';
+          '<button class="btn btn-xs btn-outline mt-3" onclick="downloadModul(' + mod.id + ')">📄 Unduh PDF Modul</button></div>';
       });
     }
     html += '</div></div>';
