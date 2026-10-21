@@ -918,7 +918,8 @@ function editJadwal(id) {
   document.getElementById('jdJamSelesai').value = j.jamSelesai;
   document.getElementById('jdMateri').value = j.materi;
   document.getElementById('modalJadwalTitle').textContent = '✏️ Edit Jadwal Praktikum';
-  openModal('modalJadwal');
+  const el = document.getElementById('modalJadwal');
+  if (el) el.classList.add('open');
 }
 
 function addJadwal() {
@@ -946,14 +947,24 @@ function addJadwal() {
   }
   saveDB();
   closeModal('modalJadwal');
-  renderJadwalAdmin();
+  if (currentRole === 'admin') {
+    renderJadwalAdmin();
+  } else {
+    renderAbsensiAslab();
+    renderJadwalAslab();
+  }
 }
 
 function deleteJadwal(id) {
   if (!confirm('Hapus jadwal ini?')) return;
   db.jadwal = db.jadwal.filter(j => j.id !== id);
+  db.absensi = db.absensi.filter(a => a.jadwalId !== id);
   saveDB();
   renderJadwalAdminTable();
+  if (currentRole === 'aslab') {
+    renderAbsensiAslab();
+    renderJadwalAslab();
+  }
   showToast('Jadwal dihapus.','error');
 }
 
@@ -1393,13 +1404,16 @@ function renderAbsensiAslab() {
           '<span style="margin-left:8px;color:var(--text-muted);font-size:12px;">' + j.jamMulai + ' - ' + j.jamSelesai + ' WIB - ' + j.lab + '</span></div>' +
           '<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">📖 ' + j.materi + '</div>' +
           '<div style="margin-top:6px;">' + statusHtml + '</div></div>' +
-          '<div class="absensi-row-action">' +
+          '<div class="absensi-row-action" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
           (bisaAbsen ?
             '<button class="btn btn-primary btn-absen" onclick="doAbsen(' + j.id + ')">✅ ABSEN</button>' :
             abs ?
             '<button class="btn btn-sm" onclick="batalAbsen(' + abs.id + ')" style="background:rgba(0,230,118,0.15);color:var(--emerald);cursor:pointer;" title="Klik untuk reset dan coba absen lagi">☑️ Selesai (Klik Uji Ulang)</button>' :
             '<button class="btn btn-sm" disabled style="background:rgba(255,255,255,0.05);color:var(--text-muted);cursor:not-allowed;">🔒 Belum Waktunya</button>'
-          ) + '</div></div>';
+          ) +
+          '<button class="btn btn-xs btn-outline" style="padding:6px 10px;font-size:12px;" onclick="editSesiAslab(' + j.id + ')" title="Edit sesi praktikum ini">✏️ Edit</button>' +
+          '<button class="btn btn-xs btn-danger" style="padding:6px 10px;font-size:12px;" onclick="hapusSesiAslab(' + j.id + ')" title="Hapus sesi praktikum ini">🗑️ Hapus</button>' +
+          '</div></div>';
       });
     }
     html += '</div>';
@@ -1438,6 +1452,13 @@ function tambahJadwalHariIni() {
   const mk = (currentUser && currentUser.matkul && currentUser.matkul[0]) ? currentUser.matkul[0] : 'Pemrograman Web';
   const lab = (currentUser && currentUser.lab) ? currentUser.lab : 'Lab 1';
   const existingToday = db.jadwal.filter(j => j.aslab === currentUser.nama && j.matkul === mk && j.tanggal === todayStr);
+
+  if (existingToday.length > 0) {
+    if (!confirm('Sesi praktikum untuk hari ini sudah ada (Pertemuan ' + existingToday[0].pertemuan + '). Apakah Anda yakin ingin membuat sesi tambahan?')) {
+      return;
+    }
+  }
+
   const pert = existingToday.length > 0 ? ((existingToday.length % 7) + 1) : 1;
   const newJadwal = {
     id: counters.jadwal++,
@@ -1453,7 +1474,38 @@ function tambahJadwalHariIni() {
   db.jadwal.unshift(newJadwal);
   saveDB();
   renderAbsensiAslab();
-  showToast('Sesi praktikum Pertemuan ' + pert + ' hari ini berhasil dibuat! Tombol ABSEN aktif.');
+  showToast('Sesi praktikum Pertemuan ' + pert + ' hari ini berhasil dibuat! Anda dapat mengedit atau menghapusnya.');
+}
+
+function editSesiAslab(id) {
+  const j = db.jadwal.find(x => x.id === id);
+  if (!j) return;
+  populateJadwalModalSelects();
+  document.getElementById('jdEditId').value = j.id;
+  document.getElementById('jdMatkul').value = j.matkul;
+  document.getElementById('jdAslab').value = j.aslab;
+  document.getElementById('jdLab').value = j.lab;
+  document.getElementById('jdPertemuan').value = j.pertemuan;
+  document.getElementById('jdTanggal').value = j.tanggal;
+  document.getElementById('jdJamMulai').value = j.jamMulai;
+  document.getElementById('jdJamSelesai').value = j.jamSelesai;
+  document.getElementById('jdMateri').value = j.materi;
+  document.getElementById('modalJadwalTitle').textContent = '✏️ Edit Sesi Praktikum';
+  const el = document.getElementById('modalJadwal');
+  if (el) el.classList.add('open');
+}
+
+function hapusSesiAslab(id) {
+  const item = db.jadwal.find(j => j.id === id);
+  if (!item) return;
+  if (!confirm('Apakah Anda yakin ingin menghapus sesi ' + item.matkul + ' (Pertemuan ' + item.pertemuan + ') ini?')) {
+    return;
+  }
+  db.jadwal = db.jadwal.filter(j => j.id !== id);
+  db.absensi = db.absensi.filter(a => a.jadwalId !== id);
+  saveDB();
+  renderAbsensiAslab();
+  showToast('Sesi praktikum ' + item.matkul + ' Pertemuan ' + item.pertemuan + ' berhasil dihapus.', 'info');
 }
 
 // ============================================================
@@ -2019,12 +2071,18 @@ function saveProfileSettings() {
 // populate jadwal modal selects
 function populateJadwalModalSelects() {
   const jdMatkul = document.getElementById('jdMatkul');
-  if (jdMatkul) jdMatkul.innerHTML = db.matkul.map(m=>'<option>'+m.nama+'</option>').join('');
   const jdAslab = document.getElementById('jdAslab');
-  if (jdAslab) jdAslab.innerHTML = db.aslab.map(a=>'<option>'+a.nama+'</option>').join('');
   const jdLab = document.getElementById('jdLab');
-  if (jdLab) jdLab.innerHTML = db.labs.map(l=>'<option>'+l.nama+'</option>').join('');
   const mdMatkul = document.getElementById('mdMatkul');
+
+  if (currentRole === 'aslab' && currentUser) {
+    if (jdMatkul) jdMatkul.innerHTML = (currentUser.matkul || []).map(m=>'<option>'+m+'</option>').join('');
+    if (jdAslab) jdAslab.innerHTML = '<option value="' + currentUser.nama + '">' + currentUser.nama + '</option>';
+  } else {
+    if (jdMatkul) jdMatkul.innerHTML = db.matkul.map(m=>'<option>'+m.nama+'</option>').join('');
+    if (jdAslab) jdAslab.innerHTML = db.aslab.map(a=>'<option>'+a.nama+'</option>').join('');
+  }
+  if (jdLab) jdLab.innerHTML = db.labs.map(l=>'<option>'+l.nama+'</option>').join('');
   if (mdMatkul) mdMatkul.innerHTML = db.matkul.map(m=>'<option>'+m.nama+'</option>').join('');
 }
 
@@ -2041,7 +2099,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Override openModal to also populate selects
   const _openModal = openModal;
   window.openModal = function(id) {
-    populateJadwalModalSelects();
+    if (id !== 'modalJadwal') {
+      populateJadwalModalSelects();
+    }
     _openModal(id);
   };
 });
