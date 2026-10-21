@@ -153,8 +153,13 @@
           <span>SILAB UIR Aktif</span>
         </div>
         <div class="clock-badge" id="timeDisplay">00:00:00</div>
-        <button class="btn btn-login-top" onclick="logoutToLoginScreen()">
-          <span>&#128682; Logout</span>
+        <button class="btn btn-login-top" onclick="logoutToLoginScreen()" title="Keluar dari SILAB UIR">
+          <svg class="logout-icon-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Logout</span>
         </button>
       </div>
     </header>
@@ -462,8 +467,13 @@
       </div>
     </div>
     <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;">
-      <button class="btn btn-outline" onclick="closeModal('modalProfile'); logoutToLoginScreen();" style="border-color:rgba(239,68,68,0.4);color:#fca5a5;">
-        &#128682; Logout
+      <button class="btn btn-outline btn-profile-logout" onclick="closeModal('modalProfile'); logoutToLoginScreen();">
+        <svg class="logout-icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        <span>Logout</span>
       </button>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-outline" onclick="closeModal('modalProfile')">Batal</button>
