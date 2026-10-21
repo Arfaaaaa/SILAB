@@ -15,7 +15,7 @@ Sistem Informasi Laboratorium Terpadu (**SILAB UIR**) adalah aplikasi web (*Sing
 * **NIP / Username:** `admin_uir`
 * **Password:** `admin123`
 * **PIN Otorisasi:** `8891`
-* **Hak Akses:** Hak kelola penuh (CRUD Mata Kuliah, Data ASLAB, Laboratorium, Jadwal Praktikum 8 pertemuan, Modul Praktikum, Data Absensi *view-only*, Rekap Kegiatan, Monitoring Checklist Kepatuhan, dan Inventaris Perangkat).
+* **Hak Akses:** Hak kelola penuh (CRUD Mata Kuliah, Data ASLAB, Laboratorium, Jadwal Praktikum 7 pertemuan pasca-UTS mulai 28 Oktober, Modul Praktikum, Data Absensi *view-only*, Rekap Kegiatan, Monitoring Checklist Kepatuhan, dan Inventaris Perangkat).
 
 ### 2. 👨‍🏫 Asisten Laboratorium (ASLAB)
 * **Hak Akses:** Akses terisolasi (*isolated scope*), hanya dapat melihat dan mengelola data praktikum untuk mata kuliah yang diampunya.

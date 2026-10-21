@@ -30,93 +30,115 @@ let db = {
     { id:5, nama:'Lab 5', kapasitas:40, status:'tersedia',    keterangan:'Lab Deep Learning dan AI Studio' },
   ],
   jadwal: [
-    { id:1,  matkul:'Pemrograman Web',   aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:1, tanggal:'2024-09-10', jamMulai:'08:00', jamSelesai:'10:00', materi:'Pengenalan HTML5 dan CSS Grid' },
-    { id:2,  matkul:'Pemrograman Web',   aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:2, tanggal:'2024-09-17', jamMulai:'08:00', jamSelesai:'10:00', materi:'Manipulasi DOM dan JavaScript Event' },
-    { id:3,  matkul:'Pemrograman Web',   aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:3, tanggal:'2024-09-24', jamMulai:'08:00', jamSelesai:'10:00', materi:'CSS Variables dan Glassmorphism UI' },
-    { id:4,  matkul:'Pemrograman Web',   aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:4, tanggal:'2024-10-01', jamMulai:'08:00', jamSelesai:'10:00', materi:'Integrasi REST API dan Fetch' },
-    { id:5,  matkul:'Pemrograman Web',   aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:5, tanggal:'2024-10-08', jamMulai:'08:00', jamSelesai:'10:00', materi:'Framework CSS Bootstrap dan Tailwind' },
-    { id:6,  matkul:'Pemrograman Web',   aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:6, tanggal:'2024-10-15', jamMulai:'08:00', jamSelesai:'10:00', materi:'SPA Single Page Application' },
-    { id:7,  matkul:'Pemrograman Web',   aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:7, tanggal:'2024-10-22', jamMulai:'08:00', jamSelesai:'10:00', materi:'Form Validation dan Local Storage' },
-    { id:8,  matkul:'Pemrograman Web',   aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:8, tanggal:'2024-10-29', jamMulai:'08:00', jamSelesai:'10:00', materi:'Deployment dan Project Final Web' },
-    { id:9,  matkul:'Basis Data',        aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:1, tanggal:'2024-09-10', jamMulai:'10:00', jamSelesai:'12:00', materi:'Konsep Basis Data Relasional dan ERD' },
-    { id:10, matkul:'Basis Data',        aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:2, tanggal:'2024-09-17', jamMulai:'10:00', jamSelesai:'12:00', materi:'DDL dan DML SQL CREATE INSERT UPDATE' },
-    { id:11, matkul:'Basis Data',        aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:3, tanggal:'2024-09-24', jamMulai:'10:00', jamSelesai:'12:00', materi:'SQL Joins dan Aggregate Functions' },
-    { id:12, matkul:'Basis Data',        aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:4, tanggal:'2024-10-01', jamMulai:'10:00', jamSelesai:'12:00', materi:'Transaction Management dan Indexing' },
-    { id:13, matkul:'Basis Data',        aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:5, tanggal:'2024-10-08', jamMulai:'10:00', jamSelesai:'12:00', materi:'Stored Procedures dan Trigger' },
-    { id:14, matkul:'Basis Data',        aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:6, tanggal:'2024-10-15', jamMulai:'10:00', jamSelesai:'12:00', materi:'Normalisasi dan Denormalisasi' },
-    { id:15, matkul:'Basis Data',        aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:7, tanggal:'2024-10-22', jamMulai:'10:00', jamSelesai:'12:00', materi:'NoSQL dan MongoDB Dasar' },
-    { id:16, matkul:'Basis Data',        aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:8, tanggal:'2024-10-29', jamMulai:'10:00', jamSelesai:'12:00', materi:'Project Final Basis Data' },
-    { id:17, matkul:'Kecerdasan Buatan', aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:1, tanggal:'2024-09-11', jamMulai:'13:00', jamSelesai:'15:00', materi:'Pengenalan AI dan Python for Data Science' },
-    { id:18, matkul:'Kecerdasan Buatan', aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:2, tanggal:'2024-09-18', jamMulai:'13:00', jamSelesai:'15:00', materi:'Supervised Learning dan Scikit-Learn' },
-    { id:19, matkul:'Kecerdasan Buatan', aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:3, tanggal:'2024-09-25', jamMulai:'13:00', jamSelesai:'15:00', materi:'Neural Networks dan Deep Learning' },
-    { id:20, matkul:'Kecerdasan Buatan', aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:4, tanggal:'2024-10-02', jamMulai:'13:00', jamSelesai:'15:00', materi:'Computer Vision dan OpenCV' },
-    { id:21, matkul:'Kecerdasan Buatan', aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:5, tanggal:'2024-10-09', jamMulai:'13:00', jamSelesai:'15:00', materi:'NLP Natural Language Processing' },
-    { id:22, matkul:'Kecerdasan Buatan', aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:6, tanggal:'2024-10-16', jamMulai:'13:00', jamSelesai:'15:00', materi:'Reinforcement Learning Dasar' },
-    { id:23, matkul:'Kecerdasan Buatan', aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:7, tanggal:'2024-10-23', jamMulai:'13:00', jamSelesai:'15:00', materi:'Model Deployment dan API' },
-    { id:24, matkul:'Kecerdasan Buatan', aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:8, tanggal:'2024-10-30', jamMulai:'13:00', jamSelesai:'15:00', materi:'Project Final AI' },
-    { id:25, matkul:'Jaringan Komputer', aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:1, tanggal:'2024-09-11', jamMulai:'08:00', jamSelesai:'10:00', materi:'Model OSI dan Topologi LAN' },
-    { id:26, matkul:'Jaringan Komputer', aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:2, tanggal:'2024-09-18', jamMulai:'08:00', jamSelesai:'10:00', materi:'Subnetting IPv4 dan VLSM' },
-    { id:27, matkul:'Jaringan Komputer', aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:3, tanggal:'2024-09-25', jamMulai:'08:00', jamSelesai:'10:00', materi:'VLAN dan Inter-VLAN Routing' },
-    { id:28, matkul:'Jaringan Komputer', aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:4, tanggal:'2024-10-02', jamMulai:'08:00', jamSelesai:'10:00', materi:'Routing Dinamik OSPF' },
-    { id:29, matkul:'Jaringan Komputer', aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:5, tanggal:'2024-10-09', jamMulai:'08:00', jamSelesai:'10:00', materi:'Wireless Security dan WPA' },
-    { id:30, matkul:'Jaringan Komputer', aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:6, tanggal:'2024-10-16', jamMulai:'08:00', jamSelesai:'10:00', materi:'Firewall dan Network Security' },
-    { id:31, matkul:'Jaringan Komputer', aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:7, tanggal:'2024-10-23', jamMulai:'08:00', jamSelesai:'10:00', materi:'Monitoring Jaringan dan Wireshark' },
-    { id:32, matkul:'Jaringan Komputer', aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:8, tanggal:'2024-10-30', jamMulai:'08:00', jamSelesai:'10:00', materi:'Project Final Jaringan' },
-    { id:33, matkul:'Pemrograman Mobile',aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:1, tanggal:'2024-09-12', jamMulai:'08:00', jamSelesai:'10:00', materi:'Setup Flutter dan Android SDK' },
-    { id:34, matkul:'Pemrograman Mobile',aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:2, tanggal:'2024-09-19', jamMulai:'08:00', jamSelesai:'10:00', materi:'Layout Widgets dan State Management' },
-    { id:35, matkul:'Pemrograman Mobile',aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:3, tanggal:'2024-09-26', jamMulai:'08:00', jamSelesai:'10:00', materi:'Navigasi Multi-Screen dan Routing' },
-    { id:36, matkul:'Pemrograman Mobile',aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:4, tanggal:'2024-10-03', jamMulai:'08:00', jamSelesai:'10:00', materi:'Firebase Auth dan Realtime DB' },
-    { id:37, matkul:'Pemrograman Mobile',aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:5, tanggal:'2024-10-10', jamMulai:'08:00', jamSelesai:'10:00', materi:'REST API Integration Flutter' },
-    { id:38, matkul:'Pemrograman Mobile',aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:6, tanggal:'2024-10-17', jamMulai:'08:00', jamSelesai:'10:00', materi:'Local Storage dan SQLite' },
-    { id:39, matkul:'Pemrograman Mobile',aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:7, tanggal:'2024-10-24', jamMulai:'08:00', jamSelesai:'10:00', materi:'Push Notification dan FCM' },
-    { id:40, matkul:'Pemrograman Mobile',aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:8, tanggal:'2024-10-31', jamMulai:'08:00', jamSelesai:'10:00', materi:'Project Final Mobile App' },
+    // 1. Pemrograman Web — Andi Prasetyo (Lab 1 | Setiap Senin 08:00 - 10:00 WIB)
+    { id:1,  matkul:'Pemrograman Web',    aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:1, tanggal:'2024-10-28', jamMulai:'08:00', jamSelesai:'10:00', materi:'Pengenalan HTML5 Modern, Semantik & CSS Grid' },
+    { id:2,  matkul:'Pemrograman Web',    aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:2, tanggal:'2024-11-04', jamMulai:'08:00', jamSelesai:'10:00', materi:'Manipulasi DOM, JavaScript ES6+ & Event Handling' },
+    { id:3,  matkul:'Pemrograman Web',    aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:3, tanggal:'2024-11-11', jamMulai:'08:00', jamSelesai:'10:00', materi:'CSS Variables, Flexbox & Desain Glassmorphism UI' },
+    { id:4,  matkul:'Pemrograman Web',    aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:4, tanggal:'2024-11-18', jamMulai:'08:00', jamSelesai:'10:00', materi:'Integrasi REST API Publik menggunakan Fetch & Async/Await' },
+    { id:5,  matkul:'Pemrograman Web',    aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:5, tanggal:'2024-11-25', jamMulai:'08:00', jamSelesai:'10:00', materi:'Validasi Form Interaktif & Local Storage State Management' },
+    { id:6,  matkul:'Pemrograman Web',    aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:6, tanggal:'2024-12-02', jamMulai:'08:00', jamSelesai:'10:00', materi:'Arsitektur Single Page Application (SPA) & Dynamic Routing' },
+    { id:7,  matkul:'Pemrograman Web',    aslab:'Andi Prasetyo', lab:'Lab 1', pertemuan:7, tanggal:'2024-12-09', jamMulai:'08:00', jamSelesai:'10:00', materi:'Final Project Web Application & Deployment ke Cloud Vercel' },
+
+    // 2. Kecerdasan Buatan (Kelas B) — Eko Santoso (Lab 5 | Setiap Senin 13:00 - 15:00 WIB)
+    { id:8,  matkul:'Kecerdasan Buatan',  aslab:'Eko Santoso',   lab:'Lab 5', pertemuan:1, tanggal:'2024-10-28', jamMulai:'13:00', jamSelesai:'15:00', materi:'Pengenalan AI & Python Data Science (NumPy, Pandas)' },
+    { id:9,  matkul:'Kecerdasan Buatan',  aslab:'Eko Santoso',   lab:'Lab 5', pertemuan:2, tanggal:'2024-11-04', jamMulai:'13:00', jamSelesai:'15:00', materi:'Supervised Learning: Regresi Linear & Klasifikasi Scikit-Learn' },
+    { id:10, matkul:'Kecerdasan Buatan',  aslab:'Eko Santoso',   lab:'Lab 5', pertemuan:3, tanggal:'2024-11-11', jamMulai:'13:00', jamSelesai:'15:00', materi:'Artificial Neural Networks (ANN) & Fondasi Deep Learning' },
+    { id:11, matkul:'Kecerdasan Buatan',  aslab:'Eko Santoso',   lab:'Lab 5', pertemuan:4, tanggal:'2024-11-18', jamMulai:'13:00', jamSelesai:'15:00', materi:'Computer Vision & Convolutional Neural Network (CNN)' },
+    { id:12, matkul:'Kecerdasan Buatan',  aslab:'Eko Santoso',   lab:'Lab 5', pertemuan:5, tanggal:'2024-11-25', jamMulai:'13:00', jamSelesai:'15:00', materi:'Natural Language Processing (NLP) & Analisis Sentimen' },
+    { id:13, matkul:'Kecerdasan Buatan',  aslab:'Eko Santoso',   lab:'Lab 5', pertemuan:6, tanggal:'2024-12-02', jamMulai:'13:00', jamSelesai:'15:00', materi:'Optimasi Model, Hyperparameter Tuning & Cross-Validation' },
+    { id:14, matkul:'Kecerdasan Buatan',  aslab:'Eko Santoso',   lab:'Lab 5', pertemuan:7, tanggal:'2024-12-09', jamMulai:'13:00', jamSelesai:'15:00', materi:'Final Project AI: Deployment Machine Learning via API' },
+
+    // 3. Basis Data — Budi Hermawan (Lab 2 | Setiap Selasa 08:00 - 10:00 WIB)
+    { id:15, matkul:'Basis Data',         aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:1, tanggal:'2024-10-29', jamMulai:'08:00', jamSelesai:'10:00', materi:'Perancangan Konseptual ERD dan Normalisasi Basis Data (1NF-3NF)' },
+    { id:16, matkul:'Basis Data',         aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:2, tanggal:'2024-11-05', jamMulai:'08:00', jamSelesai:'10:00', materi:'DDL dan DML SQL: CREATE, ALTER, INSERT, UPDATE, DELETE' },
+    { id:17, matkul:'Basis Data',         aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:3, tanggal:'2024-11-12', jamMulai:'08:00', jamSelesai:'10:00', materi:'Query Kompleks SQL: Multi-table Joins, GROUP BY & Subqueries' },
+    { id:18, matkul:'Basis Data',         aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:4, tanggal:'2024-11-19', jamMulai:'08:00', jamSelesai:'10:00', materi:'Transaction Management (ACID) & Indexing Database' },
+    { id:19, matkul:'Basis Data',         aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:5, tanggal:'2024-11-26', jamMulai:'08:00', jamSelesai:'10:00', materi:'Pembuatan Stored Procedures, Functions & Database Trigger' },
+    { id:20, matkul:'Basis Data',         aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:6, tanggal:'2024-12-03', jamMulai:'08:00', jamSelesai:'10:00', materi:'Pengenalan NoSQL Database & Operasi Dokumen MongoDB' },
+    { id:21, matkul:'Basis Data',         aslab:'Budi Hermawan', lab:'Lab 2', pertemuan:7, tanggal:'2024-12-10', jamMulai:'08:00', jamSelesai:'10:00', materi:'Final Project Database Implementation & Performance Tuning' },
+
+    // 4. Jaringan Komputer — Citra Dewi (Lab 3 | Setiap Rabu 08:00 - 10:00 WIB)
+    { id:22, matkul:'Jaringan Komputer',  aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:1, tanggal:'2024-10-30', jamMulai:'08:00', jamSelesai:'10:00', materi:'Arsitektur Model OSI, Topologi Jaringan & Pengkabelan UTP' },
+    { id:23, matkul:'Jaringan Komputer',  aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:2, tanggal:'2024-11-06', jamMulai:'08:00', jamSelesai:'10:00', materi:'Perhitungan Subnetting IPv4 Classless & Teknik VLSM' },
+    { id:24, matkul:'Jaringan Komputer',  aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:3, tanggal:'2024-11-13', jamMulai:'08:00', jamSelesai:'10:00', materi:'Konfigurasi Virtual LAN (VLAN) & Inter-VLAN Routing Cisco' },
+    { id:25, matkul:'Jaringan Komputer',  aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:4, tanggal:'2024-11-20', jamMulai:'08:00', jamSelesai:'10:00', materi:'Protokol Dynamic Routing OSPF & RIP pada Cisco Router' },
+    { id:26, matkul:'Jaringan Komputer',  aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:5, tanggal:'2024-11-27', jamMulai:'08:00', jamSelesai:'10:00', materi:'Keamanan Jaringan Wireless WPA2/WPA3 & Access List (ACL)' },
+    { id:27, matkul:'Jaringan Komputer',  aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:6, tanggal:'2024-12-04', jamMulai:'08:00', jamSelesai:'10:00', materi:'Analisis Trafik Paket Jaringan menggunakan Wireshark' },
+    { id:28, matkul:'Jaringan Komputer',  aslab:'Citra Dewi',    lab:'Lab 3', pertemuan:7, tanggal:'2024-12-11', jamMulai:'08:00', jamSelesai:'10:00', materi:'Final Project Desain & Implementasi Jaringan Terintegrasi' },
+
+    // 5. Pemrograman Mobile — Dian Safitri (Lab 4 | Setiap Kamis 08:00 - 10:00 WIB)
+    { id:29, matkul:'Pemrograman Mobile', aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:1, tanggal:'2024-10-31', jamMulai:'08:00', jamSelesai:'10:00', materi:'Pengenalan Bahasa Dart, Setup Flutter SDK & Android Studio' },
+    { id:30, matkul:'Pemrograman Mobile', aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:2, tanggal:'2024-11-07', jamMulai:'08:00', jamSelesai:'10:00', materi:'Pembuatan Layout Responsif, StatelessWidget & StatefulWidget' },
+    { id:31, matkul:'Pemrograman Mobile', aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:3, tanggal:'2024-11-14', jamMulai:'08:00', jamSelesai:'10:00', materi:'Manajemen Navigasi Multi-Screen & State Management Provider' },
+    { id:32, matkul:'Pemrograman Mobile', aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:4, tanggal:'2024-11-21', jamMulai:'08:00', jamSelesai:'10:00', materi:'Integrasi REST API HTTP, JSON Parsing & Model Data Dart' },
+    { id:33, matkul:'Pemrograman Mobile', aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:5, tanggal:'2024-11-28', jamMulai:'08:00', jamSelesai:'10:00', materi:'Otentikasi Pengguna & Integrasi Cloud Firebase Realtime' },
+    { id:34, matkul:'Pemrograman Mobile', aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:6, tanggal:'2024-12-05', jamMulai:'08:00', jamSelesai:'10:00', materi:'Penyimpanan Data Lokal SQLite & SharedPreferences' },
+    { id:35, matkul:'Pemrograman Mobile', aslab:'Dian Safitri',  lab:'Lab 4', pertemuan:7, tanggal:'2024-12-12', jamMulai:'08:00', jamSelesai:'10:00', materi:'Final Project Mobile Application & Build Release Production APK' },
+
+    // 6. Basis Data (Kelas B) — Eko Santoso (Lab 2 | Setiap Kamis 10:30 - 12:30 WIB)
+    { id:36, matkul:'Basis Data',         aslab:'Eko Santoso',   lab:'Lab 2', pertemuan:1, tanggal:'2024-10-31', jamMulai:'10:30', jamSelesai:'12:30', materi:'Perancangan Konseptual ERD dan Normalisasi Basis Data (1NF-3NF)' },
+    { id:37, matkul:'Basis Data',         aslab:'Eko Santoso',   lab:'Lab 2', pertemuan:2, tanggal:'2024-11-07', jamMulai:'10:30', jamSelesai:'12:30', materi:'DDL dan DML SQL: CREATE, ALTER, INSERT, UPDATE, DELETE' },
+    { id:38, matkul:'Basis Data',         aslab:'Eko Santoso',   lab:'Lab 2', pertemuan:3, tanggal:'2024-11-14', jamMulai:'10:30', jamSelesai:'12:30', materi:'Query Kompleks SQL: Multi-table Joins, GROUP BY & Subqueries' },
+    { id:39, matkul:'Basis Data',         aslab:'Eko Santoso',   lab:'Lab 2', pertemuan:4, tanggal:'2024-11-21', jamMulai:'10:30', jamSelesai:'12:30', materi:'Transaction Management (ACID) & Indexing Database' },
+    { id:40, matkul:'Basis Data',         aslab:'Eko Santoso',   lab:'Lab 2', pertemuan:5, tanggal:'2024-11-28', jamMulai:'10:30', jamSelesai:'12:30', materi:'Pembuatan Stored Procedures, Functions & Database Trigger' },
+    { id:41, matkul:'Basis Data',         aslab:'Eko Santoso',   lab:'Lab 2', pertemuan:6, tanggal:'2024-12-05', jamMulai:'10:30', jamSelesai:'12:30', materi:'Pengenalan NoSQL Database & Operasi Dokumen MongoDB' },
+    { id:42, matkul:'Basis Data',         aslab:'Eko Santoso',   lab:'Lab 2', pertemuan:7, tanggal:'2024-12-12', jamMulai:'10:30', jamSelesai:'12:30', materi:'Final Project Database Implementation & Performance Tuning' },
+
+    // 7. Kecerdasan Buatan — Andi Prasetyo (Lab 5 | Setiap Jumat 08:00 - 10:00 WIB)
+    { id:43, matkul:'Kecerdasan Buatan',  aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:1, tanggal:'2024-11-01', jamMulai:'08:00', jamSelesai:'10:00', materi:'Fondasi Python for AI, NumPy, Pandas & Data Visualization' },
+    { id:44, matkul:'Kecerdasan Buatan',  aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:2, tanggal:'2024-11-08', jamMulai:'08:00', jamSelesai:'10:00', materi:'Supervised Learning: Linear Regression & Classifier Scikit-Learn' },
+    { id:45, matkul:'Kecerdasan Buatan',  aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:3, tanggal:'2024-11-15', jamMulai:'08:00', jamSelesai:'10:00', materi:'Artificial Neural Networks (ANN) & Fondasi Deep Learning' },
+    { id:46, matkul:'Kecerdasan Buatan',  aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:4, tanggal:'2024-11-22', jamMulai:'08:00', jamSelesai:'10:00', materi:'Computer Vision: Image Processing dengan OpenCV & CNN' },
+    { id:47, matkul:'Kecerdasan Buatan',  aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:5, tanggal:'2024-11-29', jamMulai:'08:00', jamSelesai:'10:00', materi:'Natural Language Processing (NLP): Tokenisasi & Sentimen Analisis' },
+    { id:48, matkul:'Kecerdasan Buatan',  aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:6, tanggal:'2024-12-06', jamMulai:'08:00', jamSelesai:'10:00', materi:'Evaluasi Model, Hyperparameter Tuning & Cross Validation' },
+    { id:49, matkul:'Kecerdasan Buatan',  aslab:'Andi Prasetyo', lab:'Lab 5', pertemuan:7, tanggal:'2024-12-13', jamMulai:'08:00', jamSelesai:'10:00', materi:'Final Project AI: Model Deployment API Menggunakan FastAPI' },
   ],
-  absensi: [
-    { id:1, jadwalId:1,  aslab:'Andi Prasetyo', matkul:'Pemrograman Web',   pertemuan:1, tanggal:'2024-09-10', waktuAbsen:'08:05', status:'Hadir' },
-    { id:2, jadwalId:9,  aslab:'Budi Hermawan', matkul:'Basis Data',         pertemuan:1, tanggal:'2024-09-10', waktuAbsen:'10:02', status:'Hadir' },
-    { id:3, jadwalId:25, aslab:'Citra Dewi',    matkul:'Jaringan Komputer',  pertemuan:1, tanggal:'2024-09-11', waktuAbsen:'08:03', status:'Hadir' },
-  ],
+  absensi: [],
   modul: [
+    // 1. Pemrograman Web
     { id:1,  matkul:'Pemrograman Web',    pertemuan:1, judul:'Modul 1 - Dasar HTML5 dan CSS Grid',        deskripsi:'Membuat antarmuka web modern responsive dengan CSS variabel dan Grid Layout.' },
     { id:2,  matkul:'Pemrograman Web',    pertemuan:2, judul:'Modul 2 - DOM dan JavaScript Event',        deskripsi:'Manipulasi DOM secara dinamis dan pengelolaan event handling modern.' },
     { id:3,  matkul:'Pemrograman Web',    pertemuan:3, judul:'Modul 3 - CSS Variables dan Glassmorphism', deskripsi:'Desain UI modern dengan CSS custom properties dan efek kaca.' },
     { id:4,  matkul:'Pemrograman Web',    pertemuan:4, judul:'Modul 4 - REST API dan Fetch',              deskripsi:'Integrasi API publik menggunakan Fetch API dan async/await.' },
     { id:5,  matkul:'Pemrograman Web',    pertemuan:5, judul:'Modul 5 - Bootstrap dan Tailwind',          deskripsi:'Penggunaan framework CSS untuk mempercepat pengembangan UI.' },
     { id:6,  matkul:'Pemrograman Web',    pertemuan:6, judul:'Modul 6 - Single Page Application',         deskripsi:'Membangun SPA tanpa reload halaman dengan state management.' },
-    { id:7,  matkul:'Pemrograman Web',    pertemuan:7, judul:'Modul 7 - Form Validation dan Storage',     deskripsi:'Validasi form sisi klien dan penyimpanan data lokal.' },
-    { id:8,  matkul:'Pemrograman Web',    pertemuan:8, judul:'Modul 8 - Deployment Project Web',          deskripsi:'Deploy aplikasi ke Netlify/Vercel dan presentasi proyek akhir.' },
-    { id:9,  matkul:'Basis Data',         pertemuan:1, judul:'Modul 1 - ERD dan Normalisasi',             deskripsi:'Perancangan ERD dan normalisasi hingga 3NF.' },
-    { id:10, matkul:'Basis Data',         pertemuan:2, judul:'Modul 2 - DDL dan DML SQL',                 deskripsi:'Perintah dasar CREATE, INSERT, UPDATE, DELETE.' },
-    { id:11, matkul:'Basis Data',         pertemuan:3, judul:'Modul 3 - SQL Joins',                       deskripsi:'INNER, LEFT, RIGHT JOIN dan UNION.' },
-    { id:12, matkul:'Basis Data',         pertemuan:4, judul:'Modul 4 - Transaction dan Index',           deskripsi:'ACID, BEGIN TRANSACTION, ROLLBACK, dan Index strategi.' },
-    { id:13, matkul:'Basis Data',         pertemuan:5, judul:'Modul 5 - Stored Procedure',                deskripsi:'Pembuatan stored procedure dan trigger database.' },
-    { id:14, matkul:'Basis Data',         pertemuan:6, judul:'Modul 6 - Normalisasi Lanjut',              deskripsi:'Normalisasi BCNF dan denormalisasi untuk performa.' },
-    { id:15, matkul:'Basis Data',         pertemuan:7, judul:'Modul 7 - NoSQL dan MongoDB',               deskripsi:'Pengenalan NoSQL dan operasi CRUD di MongoDB.' },
-    { id:16, matkul:'Basis Data',         pertemuan:8, judul:'Modul 8 - Project Final Basis Data',        deskripsi:'Integrasi semua konsep dalam proyek database lengkap.' },
-    { id:17, matkul:'Kecerdasan Buatan',  pertemuan:1, judul:'Modul 1 - Python for Data Science',         deskripsi:'Dasar Python, NumPy, Pandas, dan Jupyter Notebook.' },
-    { id:18, matkul:'Kecerdasan Buatan',  pertemuan:2, judul:'Modul 2 - Supervised Learning',             deskripsi:'Klasifikasi dan regresi dengan Scikit-Learn.' },
-    { id:19, matkul:'Kecerdasan Buatan',  pertemuan:3, judul:'Modul 3 - Neural Networks',                 deskripsi:'Arsitektur ANN dan implementasi PyTorch.' },
-    { id:20, matkul:'Kecerdasan Buatan',  pertemuan:4, judul:'Modul 4 - Computer Vision',                 deskripsi:'Pengolahan gambar dengan OpenCV dan CNN.' },
-    { id:21, matkul:'Kecerdasan Buatan',  pertemuan:5, judul:'Modul 5 - NLP',                             deskripsi:'Tokenisasi, embedding, dan analisis sentimen.' },
-    { id:22, matkul:'Kecerdasan Buatan',  pertemuan:6, judul:'Modul 6 - Reinforcement Learning',          deskripsi:'Konsep Q-Learning dan Policy Gradient.' },
-    { id:23, matkul:'Kecerdasan Buatan',  pertemuan:7, judul:'Modul 7 - Model Deployment',                deskripsi:'Serving model via Flask/FastAPI.' },
-    { id:24, matkul:'Kecerdasan Buatan',  pertemuan:8, judul:'Modul 8 - Project Final AI',                deskripsi:'Proyek AI lengkap dari data hingga deployment.' },
-    { id:25, matkul:'Jaringan Komputer',  pertemuan:1, judul:'Modul 1 - OSI dan LAN',                    deskripsi:'Model OSI, topologi, dan kabel UTP.' },
-    { id:26, matkul:'Jaringan Komputer',  pertemuan:2, judul:'Modul 2 - Subnetting',                     deskripsi:'Subnetting IPv4 Classless dan VLSM.' },
-    { id:27, matkul:'Jaringan Komputer',  pertemuan:3, judul:'Modul 3 - VLAN',                           deskripsi:'Konfigurasi VLAN dan Inter-VLAN Routing Cisco.' },
-    { id:28, matkul:'Jaringan Komputer',  pertemuan:4, judul:'Modul 4 - Routing OSPF',                   deskripsi:'Dynamic routing OSPF pada Cisco Packet Tracer.' },
-    { id:29, matkul:'Jaringan Komputer',  pertemuan:5, judul:'Modul 5 - Wireless Security',              deskripsi:'WPA2/3, keamanan jaringan wireless.' },
-    { id:30, matkul:'Jaringan Komputer',  pertemuan:6, judul:'Modul 6 - Firewall',                       deskripsi:'Konfigurasi ACL dan firewall Cisco.' },
-    { id:31, matkul:'Jaringan Komputer',  pertemuan:7, judul:'Modul 7 - Wireshark',                      deskripsi:'Monitoring dan analisis paket jaringan.' },
-    { id:32, matkul:'Jaringan Komputer',  pertemuan:8, judul:'Modul 8 - Project Final Jaringan',         deskripsi:'Implementasi jaringan perusahaan lengkap.' },
-    { id:33, matkul:'Pemrograman Mobile', pertemuan:1, judul:'Modul 1 - Flutter Setup',                  deskripsi:'Instalasi Flutter SDK, Dart, dan Android Studio.' },
-    { id:34, matkul:'Pemrograman Mobile', pertemuan:2, judul:'Modul 2 - Layout dan Widgets',             deskripsi:'Widget dasar, Column, Row, Container, dan StatefulWidget.' },
-    { id:35, matkul:'Pemrograman Mobile', pertemuan:3, judul:'Modul 3 - Navigasi',                       deskripsi:'Multi-screen navigation, routes, dan passing data.' },
-    { id:36, matkul:'Pemrograman Mobile', pertemuan:4, judul:'Modul 4 - Firebase',                       deskripsi:'Auth Firebase dan Realtime Database.' },
-    { id:37, matkul:'Pemrograman Mobile', pertemuan:5, judul:'Modul 5 - REST API',                       deskripsi:'HTTP request dan integrasi API menggunakan Dio.' },
-    { id:38, matkul:'Pemrograman Mobile', pertemuan:6, judul:'Modul 6 - Local Storage',                  deskripsi:'SharedPreferences dan SQLite lokal.' },
-    { id:39, matkul:'Pemrograman Mobile', pertemuan:7, judul:'Modul 7 - Push Notification',              deskripsi:'FCM dan local notification Flutter.' },
-    { id:40, matkul:'Pemrograman Mobile', pertemuan:8, judul:'Modul 8 - Project Final Mobile',           deskripsi:'Proyek app Android lengkap siap publish.' },
+    { id:7,  matkul:'Pemrograman Web',    pertemuan:7, judul:'Modul 7 - Form Validation & Storage Final', deskripsi:'Validasi form sisi klien, penyimpanan data lokal, dan final project web.' },
+
+    // 2. Basis Data
+    { id:8,  matkul:'Basis Data',         pertemuan:1, judul:'Modul 1 - ERD dan Normalisasi',             deskripsi:'Perancangan ERD dan normalisasi hingga 3NF.' },
+    { id:9,  matkul:'Basis Data',         pertemuan:2, judul:'Modul 2 - DDL dan DML SQL',                 deskripsi:'Perintah dasar CREATE, INSERT, UPDATE, DELETE.' },
+    { id:10, matkul:'Basis Data',         pertemuan:3, judul:'Modul 3 - SQL Joins',                       deskripsi:'INNER, LEFT, RIGHT JOIN dan UNION.' },
+    { id:11, matkul:'Basis Data',         pertemuan:4, judul:'Modul 4 - Transaction dan Index',           deskripsi:'ACID, BEGIN TRANSACTION, ROLLBACK, dan Index strategi.' },
+    { id:12, matkul:'Basis Data',         pertemuan:5, judul:'Modul 5 - Stored Procedure',                deskripsi:'Pembuatan stored procedure dan trigger database.' },
+    { id:13, matkul:'Basis Data',         pertemuan:6, judul:'Modul 6 - Normalisasi Lanjut',              deskripsi:'Normalisasi BCNF dan denormalisasi untuk performa.' },
+    { id:14, matkul:'Basis Data',         pertemuan:7, judul:'Modul 7 - NoSQL, MongoDB & Final Project',  deskripsi:'Pengenalan NoSQL, operasi CRUD di MongoDB, dan final project database.' },
+
+    // 3. Kecerdasan Buatan
+    { id:15, matkul:'Kecerdasan Buatan',  pertemuan:1, judul:'Modul 1 - Python for Data Science',         deskripsi:'Dasar Python, NumPy, Pandas, dan Jupyter Notebook.' },
+    { id:16, matkul:'Kecerdasan Buatan',  pertemuan:2, judul:'Modul 2 - Supervised Learning',             deskripsi:'Klasifikasi dan regresi dengan Scikit-Learn.' },
+    { id:17, matkul:'Kecerdasan Buatan',  pertemuan:3, judul:'Modul 3 - Neural Networks',                 deskripsi:'Arsitektur ANN dan implementasi PyTorch.' },
+    { id:18, matkul:'Kecerdasan Buatan',  pertemuan:4, judul:'Modul 4 - Computer Vision',                 deskripsi:'Pengolahan gambar dengan OpenCV dan CNN.' },
+    { id:19, matkul:'Kecerdasan Buatan',  pertemuan:5, judul:'Modul 5 - NLP',                             deskripsi:'Tokenisasi, embedding, dan analisis sentimen.' },
+    { id:20, matkul:'Kecerdasan Buatan',  pertemuan:6, judul:'Modul 6 - Reinforcement Learning',          deskripsi:'Konsep Q-Learning dan Policy Gradient.' },
+    { id:21, matkul:'Kecerdasan Buatan',  pertemuan:7, judul:'Modul 7 - Model Deployment & Final AI',     deskripsi:'Serving model machine learning via FastAPI dan final project AI.' },
+
+    // 4. Jaringan Komputer
+    { id:22, matkul:'Jaringan Komputer',  pertemuan:1, judul:'Modul 1 - OSI dan LAN',                    deskripsi:'Model OSI, topologi, dan kabel UTP.' },
+    { id:23, matkul:'Jaringan Komputer',  pertemuan:2, judul:'Modul 2 - Subnetting',                     deskripsi:'Subnetting IPv4 Classless dan VLSM.' },
+    { id:24, matkul:'Jaringan Komputer',  pertemuan:3, judul:'Modul 3 - VLAN',                           deskripsi:'Konfigurasi VLAN dan Inter-VLAN Routing Cisco.' },
+    { id:25, matkul:'Jaringan Komputer',  pertemuan:4, judul:'Modul 4 - Routing OSPF',                   deskripsi:'Dynamic routing OSPF pada Cisco Packet Tracer.' },
+    { id:26, matkul:'Jaringan Komputer',  pertemuan:5, judul:'Modul 5 - Wireless Security',              deskripsi:'WPA2/3, keamanan jaringan wireless.' },
+    { id:27, matkul:'Jaringan Komputer',  pertemuan:6, judul:'Modul 6 - Firewall',                       deskripsi:'Konfigurasi ACL dan firewall Cisco.' },
+    { id:28, matkul:'Jaringan Komputer',  pertemuan:7, judul:'Modul 7 - Wireshark & Final Project Net',  deskripsi:'Monitoring, analisis paket jaringan dengan Wireshark, dan final network project.' },
+
+    // 5. Pemrograman Mobile
+    { id:29, matkul:'Pemrograman Mobile', pertemuan:1, judul:'Modul 1 - Flutter Setup',                  deskripsi:'Instalasi Flutter SDK, Dart, dan Android Studio.' },
+    { id:30, matkul:'Pemrograman Mobile', pertemuan:2, judul:'Modul 2 - Layout dan Widgets',             deskripsi:'Widget dasar, Column, Row, Container, dan StatefulWidget.' },
+    { id:31, matkul:'Pemrograman Mobile', pertemuan:3, judul:'Modul 3 - Navigasi',                       deskripsi:'Multi-screen navigation, routes, dan passing data.' },
+    { id:32, matkul:'Pemrograman Mobile', pertemuan:4, judul:'Modul 4 - Firebase',                       deskripsi:'Auth Firebase dan Realtime Database.' },
+    { id:33, matkul:'Pemrograman Mobile', pertemuan:5, judul:'Modul 5 - REST API',                       deskripsi:'HTTP request dan integrasi API menggunakan Dio.' },
+    { id:34, matkul:'Pemrograman Mobile', pertemuan:6, judul:'Modul 6 - Local Storage',                  deskripsi:'SharedPreferences dan SQLite lokal.' },
+    { id:35, matkul:'Pemrograman Mobile', pertemuan:7, judul:'Modul 7 - Push Notification & Final App',  deskripsi:'FCM notification dan build final release APK production.' },
   ],
   nilai: [
     { id:1, nim:'21IF001', nama:'Ahmad Rizal',     matkul:'Pemrograman Web',   aslab:'Andi Prasetyo', nilaiTugas:88, nilaiUjian:92 },
@@ -134,7 +156,7 @@ let db = {
   ],
 };
 
-let counters = { jadwal:41, absensi:4, nilai:6, inventaris:6, matkul:6, aslab:6, modul:41 };
+let counters = { jadwal:50, absensi:1, nilai:6, inventaris:6, matkul:6, aslab:6, modul:36 };
 let currentRole = null;
 let currentUser = null;
 
@@ -154,26 +176,32 @@ function saveDB() {
   }
 }
 
+const DB_SCHEMA_VERSION = 'silab_uir_v5_postuts_7pertemuan';
+
 function loadDB() {
   try {
+    const version = localStorage.getItem('silab_db_version');
     const rawDB = localStorage.getItem('silab_uir_db');
     const rawCounters = localStorage.getItem('silab_uir_counters');
-    if (rawDB) {
+    if (rawDB && version === DB_SCHEMA_VERSION) {
       db = JSON.parse(rawDB);
       if (!db.admins || !Array.isArray(db.admins) || db.admins.length === 0) {
         db.admins = [
           { id:1, nip:'198705152010121002', nama:'Laboran Utama FT', username:'admin_uir', password:'admin123', pin:'8891' }
         ];
       }
+      if (rawCounters) {
+        counters = JSON.parse(rawCounters);
+      }
+      ensureTestScheduleForToday();
     } else {
+      // Perbarui otomatis ke kurikulum 7 pertemuan pasca-UTS UIR mulai 28 Oktober
+      db = JSON.parse(JSON.stringify(defaultDbSeed));
+      counters = JSON.parse(JSON.stringify(defaultCountersSeed));
+      localStorage.setItem('silab_db_version', DB_SCHEMA_VERSION);
       ensureTestScheduleForToday();
       saveDB();
     }
-    if (rawCounters) {
-      counters = JSON.parse(rawCounters);
-    }
-    // Pastikan selalu ada jadwal untuk hari ini agar tombol absensi bisa diuji
-    ensureTestScheduleForToday();
   } catch (e) {
     console.error('Gagal memuat database dari localStorage:', e);
     ensureTestScheduleForToday();
@@ -193,11 +221,11 @@ function ensureTestScheduleForToday() {
         matkul: mk,
         aslab: a.nama,
         lab: a.lab || 'Lab 1',
-        pertemuan: 6,
+        pertemuan: 1,
         tanggal: todayStr,
         jamMulai: '07:00',
         jamSelesai: '23:59',
-        materi: 'Sesi Praktikum Aktif Hari Ini (' + formatTanggal(todayStr) + ') — Siap Presensi'
+        materi: 'Sesi Praktikum Pertemuan 1 (' + formatTanggal(todayStr) + ') — Siap Presensi'
       });
       added = true;
     }
@@ -832,7 +860,7 @@ function renderJadwalAdmin() {
   if (!el) return;
   el.innerHTML =
     '<div class="view-header"><div><h1 class="view-title">Data Jadwal</h1>' +
-    '<p class="view-desc">Jadwal praktikum per ASLAB. Dibuat oleh Laboran, 8 pertemuan per mata kuliah.</p></div>' +
+    '<p class="view-desc">Jadwal praktikum per ASLAB. Dibuat oleh Laboran, 7 pertemuan pasca-UTS per mata kuliah (Mulai Senin, 28 Oktober).</p></div>' +
     '<button class="btn btn-primary" onclick="openJadwalModal()">+ Tambah Jadwal</button></div>' +
     '<div class="filter-toolbar mb-4">' +
     '<div class="filter-group"><span class="filter-label">Filter ASLAB:</span>' +
@@ -843,7 +871,7 @@ function renderJadwalAdmin() {
     '<option value="">Semua Matkul</option>' + db.matkul.map(m => '<option>' + m.nama + '</option>').join('') + '</select></div></div>' +
     '<div class="glass-card"><div class="card-title-bar"><h3>📅 Tabel Data Jadwal</h3></div>' +
     '<div class="table-responsive"><table class="custom-table">' +
-    '<thead><tr><th>No</th><th>Mata Kuliah</th><th>ASLAB</th><th>Lab</th><th>Pertemuan</th><th>Tanggal</th><th>Jam</th><th>Materi</th><th>Aksi</th></tr></thead>' +
+    '<thead><tr><th>No</th><th>Mata Kuliah</th><th>ASLAB</th><th>Lab</th><th>Pertemuan</th><th>Hari / Tanggal</th><th>Jam</th><th>Materi</th><th>Aksi</th></tr></thead>' +
     '<tbody id="jadwalAdminBody"></tbody></table></div></div>';
   renderJadwalAdminTable();
 }
@@ -1060,12 +1088,12 @@ function renderAbsensiAdmin() {
     '<option value="">Semua ASLAB</option>' + db.aslab.map(a => '<option>' + a.nama + '</option>').join('') + '</select></div>' +
     '<div class="filter-group"><span class="filter-label">Filter Pertemuan:</span>' +
     '<select id="filterAbsPert" class="form-select" onchange="renderAbsensiAdminTable()">' +
-    '<option value="">Semua</option>' + [1,2,3,4,5,6,7,8].map(p => '<option value="' + p + '">Pertemuan ' + p + '</option>').join('') +
+    '<option value="">Semua</option>' + [1,2,3,4,5,6,7].map(p => '<option value="' + p + '">Pertemuan ' + p + '</option>').join('') +
     '</select></div></div>' +
     '<div class="glass-card"><div class="card-title-bar"><h3>📝 Rekap Data Absensi ASLAB</h3>' +
     '<span class="pill-tag glow">View Only</span></div>' +
     '<div class="table-responsive"><table class="custom-table">' +
-    '<thead><tr><th>No</th><th>ASLAB</th><th>Mata Kuliah</th><th>Pertemuan</th><th>Tanggal</th><th>Waktu Absen</th><th>Status</th></tr></thead>' +
+    '<thead><tr><th>No</th><th>ASLAB</th><th>Mata Kuliah</th><th>Pertemuan</th><th>Hari / Tanggal</th><th>Waktu Absen</th><th>Status</th></tr></thead>' +
     '<tbody id="absensiAdminBody"></tbody></table></div></div>';
   renderAbsensiAdminTable();
 }
@@ -1284,10 +1312,11 @@ function renderJadwalAslab() {
     '<span style="font-size:13px;color:var(--text-muted);">📌 Total: <strong>' + myJ.length + ' pertemuan</strong> untuk matkul: <strong>' + currentUser.matkul.join(' dan ') + '</strong></span></div>';
   currentUser.matkul.forEach(mk => {
     const jMk = myJ.filter(j => j.matkul===mk);
+    jMk.sort((a,b) => a.pertemuan - b.pertemuan || a.tanggal.localeCompare(b.tanggal));
     html += '<div class="glass-card mb-4"><div class="card-title-bar"><h3>📚 ' + mk + '</h3>' +
       '<span class="pill-tag glow">' + jMk.length + ' Pertemuan</span></div>' +
       '<div class="table-responsive"><table class="custom-table">' +
-      '<thead><tr><th>Pertemuan</th><th>Tanggal</th><th>Jam</th><th>Lab</th><th>Materi</th><th>Status Absensi</th></tr></thead><tbody>';
+      '<thead><tr><th>Pertemuan</th><th>Hari / Tanggal</th><th>Jam</th><th>Lab</th><th>Materi</th><th>Status Absensi</th></tr></thead><tbody>';
     if (jMk.length===0) {
       html += '<tr><td colspan="6" class="empty-cell">Belum ada jadwal.</td></tr>';
     } else {
@@ -1323,13 +1352,19 @@ function renderAbsensiAslab() {
     '<div class="glass-card mb-4" style="background:rgba(255,200,0,0.05);border:1px solid rgba(255,200,0,0.25);padding:14px 18px;">' +
     '<span style="font-size:13px;">⏰ <strong>Waktu Sekarang:</strong> ' + formatTimeDisplay(now) + ' WIB — ' + formatTanggal(todayStr) +
     '<br><small style="color:var(--text-muted);">Absensi hanya bisa dilakukan saat sudah memasuki waktu jadwal.</small></span></div>' +
-    '<div class="glass-card mb-4" style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.3);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">' +
+    '<div class="glass-card mb-4" style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.3);padding:14px 18px;">' +
     '<div><div style="font-weight:700;color:var(--emerald);font-size:13.5px;">🟢 Sesi Praktikum Aktif Hari Ini (' + formatTanggal(todayStr) + ')</div>' +
-    '<div style="font-size:12px;color:var(--text-muted);margin-top:3px;">Sesi praktikum terdaftar secara resmi. Asisten Lab silakan lakukan presensi kehadiran melalui tombol <strong>✅ ABSEN</strong>.</div></div>' +
-    '<button class="btn btn-xs btn-primary" onclick="tambahJadwalHariIni()">➕ Tambah Sesi Praktikum</button></div>';
+    '<div style="font-size:12px;color:var(--text-muted);margin-top:3px;">Sesi praktikum terdaftar secara resmi. Asisten Lab silakan lakukan presensi kehadiran melalui tombol <strong>✅ ABSEN</strong>.</div></div></div>';
 
   currentUser.matkul.forEach(mk => {
     const jMk = myJ.filter(j => j.matkul===mk);
+    jMk.sort((a,b) => {
+      const aIsToday = a.tanggal === todayStr;
+      const bIsToday = b.tanggal === todayStr;
+      if (aIsToday && !bIsToday) return -1;
+      if (!aIsToday && bIsToday) return 1;
+      return a.pertemuan - b.pertemuan || a.tanggal.localeCompare(b.tanggal);
+    });
     html += '<div class="glass-card mb-4"><div class="card-title-bar"><h3>📚 ' + mk + '</h3></div>';
     if (jMk.length===0) {
       html += '<p class="empty-cell">Belum ada jadwal untuk mata kuliah ini.</p>';
@@ -1402,8 +1437,8 @@ function tambahJadwalHariIni() {
   const todayStr = toDateString(now);
   const mk = (currentUser && currentUser.matkul && currentUser.matkul[0]) ? currentUser.matkul[0] : 'Pemrograman Web';
   const lab = (currentUser && currentUser.lab) ? currentUser.lab : 'Lab 1';
-  const count = db.jadwal.filter(j => j.aslab === currentUser.nama && j.matkul === mk).length;
-  const pert = (count % 8) + 1;
+  const existingToday = db.jadwal.filter(j => j.aslab === currentUser.nama && j.matkul === mk && j.tanggal === todayStr);
+  const pert = existingToday.length > 0 ? ((existingToday.length % 7) + 1) : 1;
   const newJadwal = {
     id: counters.jadwal++,
     matkul: mk,
@@ -1413,12 +1448,12 @@ function tambahJadwalHariIni() {
     tanggal: todayStr,
     jamMulai: '07:00',
     jamSelesai: '23:59',
-    materi: 'Sesi Uji Coba Presensi Praktikum (' + formatTanggal(todayStr) + ')'
+    materi: 'Sesi Praktikum Pertemuan ' + pert + ' (' + formatTanggal(todayStr) + ')'
   };
   db.jadwal.unshift(newJadwal);
   saveDB();
   renderAbsensiAslab();
-  showToast('Sesi praktikum hari ini berhasil ditambahkan! Tombol ABSEN aktif.');
+  showToast('Sesi praktikum Pertemuan ' + pert + ' hari ini berhasil dibuat! Tombol ABSEN aktif.');
 }
 
 // ============================================================
@@ -1784,10 +1819,12 @@ function toDateString(date) {
   return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');
 }
 
-function formatTanggal(str) {
+function formatTanggal(str, includeHari = true) {
   if (!str) return '-';
-  const d = new Date(str+'T00:00:00');
-  return d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+  const d = new Date(str + 'T00:00:00');
+  const opts = { day: 'numeric', month: 'long', year: 'numeric' };
+  if (includeHari) opts.weekday = 'long';
+  return d.toLocaleDateString('id-ID', opts);
 }
 
 function formatTimeDisplay(date) {

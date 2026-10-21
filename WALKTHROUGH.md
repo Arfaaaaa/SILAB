@@ -109,7 +109,7 @@ Status: 'tersedia' | 'sedang' | 'maintenance'
 
 ### db.jadwal[] — Jadwal Praktikum
 ```
-id, matkul, aslab, lab, pertemuan(1-8), tanggal, jamMulai, jamSelesai, materi
+id, matkul, aslab, lab, pertemuan(1-7), tanggal, jamMulai, jamSelesai, materi
 DIBUAT OLEH LABORAN. ASLAB tidak bisa ubah.
 ```
 
@@ -145,7 +145,7 @@ Kondisi: 'Bagus' | 'Perlu Perbaikan' | 'Rusak'
 - Mata Kuliah (CRUD)
 - Data ASLAB (CRUD + username/password)
 - Laboratorium (CRUD + ubah status)
-- Data Jadwal (CRUD — 8 pertemuan per matkul)
+- Data Jadwal (CRUD — 7 pertemuan pasca-UTS per matkul mulai 28 Oktober)
 - Modul Praktikum (CRUD)
 - Data Absensi (View Only + Export CSV)
 - Rekap Kegiatan (Export CSV)
@@ -278,7 +278,7 @@ python -m http.server 8000
 | 3 | ASLAB login username+password (bukan kode unik) | DONE   |
 | 4 | ASLAB hanya lihat data matkul sendiri           | DONE   |
 | 5 | Jadwal dibuat Laboran, ASLAB tidak bisa ubah    | DONE   |
-| 6 | 8 pertemuan per matkul, data seed lengkap       | DONE   |
+| 6 | 7 pertemuan pasca-UTS per matkul (Mulai 28 Okt) | DONE   |
 | 7 | Absensi time-gated (cek hari + jam)             | DONE   |
 | 8 | Data Absensi Admin: View Only                   | DONE   |
 | 9 | Modul: dibuat Admin, ASLAB hanya lihat          | DONE   |
