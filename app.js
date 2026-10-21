@@ -1031,67 +1031,109 @@ function deleteModul(id) {
   showToast('Modul dihapus.','error');
 }
 
+let currentPreviewModul = null;
+
 function downloadModul(id) {
   const m = db.modul.find(item => item.id === id);
   if (!m) return;
-
-  showToast('Sedang menyiapkan dokumen PDF ' + m.judul + '...');
+  currentPreviewModul = m;
 
   if (typeof generateModulHTML !== 'function') {
     showToast('Modul generator sedang dimuat, silakan coba sesaat lagi.', 'error');
     return;
   }
 
+  // Isi data modal pratinjau
+  const titleEl = document.getElementById('previewModulTitle');
+  const subEl = document.getElementById('previewModulSubtitle');
+  const paperEl = document.getElementById('modulPaperContainer');
+  
+  if (titleEl) titleEl.innerHTML = '📄 ' + m.judul;
+  if (subEl) subEl.innerHTML = 'Mata Kuliah: <strong>' + m.matkul + '</strong> • Pertemuan Ke-' + m.pertemuan + ' (Pasca-UTS) • Laboratorium Komputer FT UIR';
+  
   const htmlContent = generateModulHTML(m);
+  if (paperEl) {
+    paperEl.innerHTML = htmlContent;
+  }
+
+  // Buka modal pratinjau agar elemen masuk ke DOM viewport secara nyata (menghilangkan bug blank canvas)
+  openModal('modalModulPreview');
+  showToast('Sedang menyiapkan dokumen PDF ' + m.judul + '...');
+
+  // Otomatis picu download file PDF setelah layout modal ter-render
+  setTimeout(() => {
+    downloadModulPDFFromModal(false);
+  }, 450);
+}
+
+function downloadModulPDFFromModal(showFeedback = true) {
+  if (!currentPreviewModul) return;
+  const m = currentPreviewModul;
+  const paperEl = document.getElementById('modulPaperContainer');
+  if (!paperEl) return;
+
+  const btn = document.getElementById('btnDownloadModulDirect');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Sedang Mengunduh PDF...';
+  }
+
   const safeMatkul = m.matkul.replace(/[^a-zA-Z0-9_-]/g, '_');
   const filename = 'Modul_' + safeMatkul + '_Pertemuan_' + m.pertemuan + '.pdf';
 
   if (typeof window.html2pdf === 'function') {
-    const container = document.createElement('div');
-    container.id = 'silab-pdf-temp-container';
-    container.style.position = 'fixed';
-    container.style.left = '-9999px';
-    container.style.top = '0';
-    container.style.width = '210mm';
-    container.style.background = '#ffffff';
-    container.style.color = '#111827';
-    container.style.zIndex = '-9999';
-    container.innerHTML = htmlContent;
-    document.body.appendChild(container);
-
     const opt = {
-      margin:       [10, 10, 10, 10],
+      margin:       [10, 10, 10, 10], // mm
       filename:     filename,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      html2canvas:  {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        scrollX: 0,
+        scrollY: 0
+      },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+      pagebreak:    { mode: ['css', 'legacy'] }
     };
 
-    window.html2pdf().set(opt).from(container).save().then(() => {
-      if (document.body.contains(container)) {
-        document.body.removeChild(container);
+    window.html2pdf().set(opt).from(paperEl).save().then(() => {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '📥 Unduh File PDF Langsung';
       }
-      showToast('Modul PDF "' + m.judul + '" berhasil diunduh!');
+      showToast('File PDF "' + filename + '" berhasil diunduh!');
     }).catch(err => {
-      console.warn('html2pdf gagal mengekspor langsung, mengalihkan ke mode cetak peramban:', err);
-      if (document.body.contains(container)) {
-        document.body.removeChild(container);
+      console.warn('html2pdf gagal mengekspor langsung:', err);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '📥 Unduh File PDF Langsung';
       }
-      fallbackPrintModul(m, htmlContent);
+      showToast('Gagal ekspor otomatis, membuka jendela dialog cetak PDF...', 'warning');
+      printModulFromModal();
     });
   } else {
-    fallbackPrintModul(m, htmlContent);
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '📥 Unduh File PDF Langsung';
+    }
+    printModulFromModal();
   }
 }
 
-function fallbackPrintModul(m, htmlContent) {
+function printModulFromModal() {
+  if (!currentPreviewModul) return;
+  const m = currentPreviewModul;
+  const paperEl = document.getElementById('modulPaperContainer');
+  if (!paperEl) return;
+
   const safeMatkul = m.matkul.replace(/[^a-zA-Z0-9_-]/g, '_');
   const win = window.open('', '_blank', 'width=950,height=800');
   if (!win) {
-    showToast('Izinkan pop-up peramban untuk mencetak/menyimpan PDF modul.', 'error');
+    showToast('Izinkan pop-up peramban untuk mencetak/menyimpan PDF.', 'error');
     return;
   }
+
   win.document.open();
   win.document.write('<!DOCTYPE html>' +
 '<html lang="id">' +
@@ -1099,8 +1141,8 @@ function fallbackPrintModul(m, htmlContent) {
 '  <meta charset="utf-8">' +
 '  <title>Modul_' + safeMatkul + '_Pertemuan_' + m.pertemuan + '</title>' +
 '  <style>' +
-'    @page { size: A4 portrait; margin: 12mm; }' +
-'    body { font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 20px; color: #111827; background: #ffffff; }' +
+'    @page { size: A4 portrait; margin: 10mm; }' +
+'    body { font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 15px; color: #111827; background: #ffffff; }' +
 '    @media print {' +
 '      body { padding: 0; background: #fff !important; }' +
 '      .no-print-bar { display: none !important; }' +
@@ -1108,25 +1150,22 @@ function fallbackPrintModul(m, htmlContent) {
 '  </style>' +
 '</head>' +
 '<body>' +
-'  <div class="no-print-bar" style="margin-bottom:18px;padding:12px 16px;background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-family:Segoe UI, sans-serif;">' +
+'  <div class="no-print-bar" style="margin-bottom:15px;padding:10px 16px;background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-family:Segoe UI, sans-serif;">' +
 '    <div>' +
-'      <strong style="color:#065f46;font-size:14px;">🖨️ Dialog Cetak / Simpan PDF Dokumen Modul UIR</strong>' +
-'      <div style="font-size:12px;color:#047857;margin-top:2px;">Pilih opsi tujuan <em>"Save as PDF"</em> pada jendela printer peramban untuk menyimpan sebagai file PDF resmi.</div>' +
+'      <strong style="color:#065f46;font-size:13.5px;">🖨️ Cetak / Simpan PDF Dokumen Modul Resmi UIR</strong>' +
+'      <div style="font-size:12px;color:#047857;margin-top:2px;">Pilih tujuan <em>"Save as PDF"</em> pada dialog printer peramban untuk hasil berkualitas vektor resmi.</div>' +
 '    </div>' +
-'    <button onclick="window.print()" style="padding:9px 18px;background:#059669;color:#ffffff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">' +
-'      Simpan ke PDF Sekarang' +
+'    <button onclick="window.print()" style="padding:8px 16px;background:#059669;color:#ffffff;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">' +
+'      Simpan PDF Sekarang' +
 '    </button>' +
 '  </div>' +
-  htmlContent +
+  paperEl.innerHTML +
 '  <script>' +
-'    setTimeout(function() {' +
-'      window.print();' +
-'    }, 700);' +
+'    setTimeout(function() { window.print(); }, 500);' +
 '  </script>' +
 '</body>' +
 '</html>');
   win.document.close();
-  showToast('Dokumen PDF Modul "' + m.judul + '" dibuka di jendela cetak PDF!');
 }
 
 // ============================================================
