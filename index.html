@@ -116,17 +116,20 @@
         <span class="role-label">Mode Akses</span>
         <span class="role-name" id="currentRoleText">Laboran</span>
       </div>
-      <button class="role-switch-btn" onclick="logoutToLoginScreen()" title="Logout">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-      </button>
     </div>
     <nav class="sidebar-nav" id="sidebar-nav"></nav>
     <div class="sidebar-footer">
-      <div class="user-profile" onclick="logoutToLoginScreen()">
+      <div class="user-profile" onclick="openProfileModal()" title="Buka Pengaturan Profil Pengguna">
         <div class="avatar" id="userAvatar">A</div>
         <div class="user-meta">
           <span class="user-name" id="userName">Administrator</span>
           <span class="user-sub" id="userEmail">lab@uir.ac.id</span>
+        </div>
+        <div class="user-profile-cog" title="Pengaturan">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
         </div>
       </div>
     </div>
@@ -391,6 +394,84 @@
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalInventaris')">Batal</button>
       <button class="btn btn-primary" onclick="addInventaris()">&#10003; Simpan Aset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Pengaturan Profil -->
+<div class="modal-overlay" id="modalProfile">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>&#9881;&#65039; Pengaturan Profil Pengguna</h3>
+      <button class="modal-close" onclick="closeModal('modalProfile')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <!-- Profile Header Summary Card -->
+      <div class="profile-modal-card-header">
+        <div class="profile-avatar-large" id="profAvatar">L</div>
+        <div class="profile-header-info">
+          <div class="profile-header-name" id="profNamaHeader">Laboran Utama FT</div>
+          <div><span id="profRoleBadge" class="auth-badge-tag admin-badge">&#128737; Laboran / Admin</span></div>
+          <div class="profile-header-email" id="profEmailHeader">laboran.admin@uir.ac.id</div>
+        </div>
+      </div>
+
+      <!-- Identitas Form -->
+      <div class="form-row-2">
+        <div class="form-field">
+          <label>Nama Lengkap *</label>
+          <input type="text" id="profNama" class="form-control" placeholder="Nama Lengkap" />
+        </div>
+        <div class="form-field">
+          <label id="profIdLabel">NIP / NIM</label>
+          <input type="text" id="profId" class="form-control" readonly style="opacity:0.75;background:rgba(0,0,0,0.35);cursor:not-allowed;" />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Nomor Kontak / WhatsApp</label>
+        <input type="text" id="profContact" class="form-control" placeholder="0812-xxxx-xxxx" />
+      </div>
+
+      <!-- Penugasan ASLAB (Dinamis: Disembunyikan untuk Laboran) -->
+      <div id="profAslabDetails" style="display:none;">
+        <div class="form-row-2">
+          <div class="form-field">
+            <label>Mata Kuliah Pengampuan</label>
+            <input type="text" id="profMatkul" class="form-control" readonly style="opacity:0.75;background:rgba(0,0,0,0.35);cursor:not-allowed;" />
+          </div>
+          <div class="form-field">
+            <label>Ruang Laboratorium</label>
+            <input type="text" id="profLab" class="form-control" readonly style="opacity:0.75;background:rgba(0,0,0,0.35);cursor:not-allowed;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Ganti Kata Sandi (Opsional) -->
+      <div style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--border-light);">
+        <span style="font-size:12px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:8px;">
+          &#128274; Ubah Kata Sandi <small style="font-weight:400;color:var(--text-dim);">(Kosongkan jika tidak ingin mengubah)</small>
+        </span>
+        <div class="form-row-2">
+          <div class="form-field">
+            <label>Kata Sandi Baru</label>
+            <input type="password" id="profNewPass" class="form-control" placeholder="Minimal 5 karakter" />
+          </div>
+          <div class="form-field">
+            <label>Konfirmasi Kata Sandi Baru</label>
+            <input type="password" id="profConfirmPass" class="form-control" placeholder="Ulangi kata sandi baru" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;">
+      <button class="btn btn-outline" onclick="closeModal('modalProfile'); logoutToLoginScreen();" style="border-color:rgba(239,68,68,0.4);color:#fca5a5;">
+        &#128682; Logout
+      </button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="closeModal('modalProfile')">Batal</button>
+        <button class="btn btn-primary" onclick="saveProfileSettings()">&#10003; Simpan Perubahan</button>
+      </div>
     </div>
   </div>
 </div>

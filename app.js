@@ -1837,6 +1837,148 @@ function toggleSidebar() {
   }
 }
 
+// ============================================================
+// PROFILE SETTINGS MODAL
+// ============================================================
+function openProfileModal() {
+  if (!currentUser) return;
+
+  const initial = (currentUser.nama || 'U').charAt(0).toUpperCase();
+  const profAvatar = document.getElementById('profAvatar');
+  if (profAvatar) profAvatar.textContent = initial;
+
+  const profNamaHeader = document.getElementById('profNamaHeader');
+  if (profNamaHeader) profNamaHeader.textContent = currentUser.nama;
+
+  const profRoleBadge = document.getElementById('profRoleBadge');
+  if (profRoleBadge) {
+    if (currentRole === 'admin') {
+      profRoleBadge.textContent = '🛡️ Laboran / Admin';
+      profRoleBadge.className = 'auth-badge-tag admin-badge';
+    } else {
+      profRoleBadge.textContent = '👨‍🏫 Asisten Laboratorium (ASLAB)';
+      profRoleBadge.className = 'auth-badge-tag user-badge';
+    }
+  }
+
+  const profEmailHeader = document.getElementById('profEmailHeader');
+  if (profEmailHeader) {
+    const email = currentRole === 'admin'
+      ? 'laboran.admin@uir.ac.id'
+      : ((currentUser.nim || 'aslab').toLowerCase() + '@aslab.uir.ac.id');
+    profEmailHeader.textContent = email;
+  }
+
+  // Field nilai identitas
+  const profNama = document.getElementById('profNama');
+  if (profNama) profNama.value = currentUser.nama || '';
+
+  const profId = document.getElementById('profId');
+  if (profId) {
+    profId.value = currentRole === 'admin'
+      ? (currentUser.nip || '198705152010121002')
+      : (currentUser.nim || '-');
+  }
+
+  const profIdLabel = document.getElementById('profIdLabel');
+  if (profIdLabel) {
+    profIdLabel.textContent = currentRole === 'admin' ? 'NIP Laboran' : 'NIM ASLAB';
+  }
+
+  const profContact = document.getElementById('profContact');
+  if (profContact) {
+    profContact.value = currentUser.contact || (currentRole === 'admin' ? '0812-7654-0001' : '-');
+  }
+
+  // Khusus ASLAB: penugasan
+  const profAslabDetails = document.getElementById('profAslabDetails');
+  if (profAslabDetails) {
+    if (currentRole === 'aslab') {
+      profAslabDetails.style.display = 'block';
+      const profMatkul = document.getElementById('profMatkul');
+      if (profMatkul) {
+        profMatkul.value = Array.isArray(currentUser.matkul) ? currentUser.matkul.join(', ') : (currentUser.matkul || '-');
+      }
+      const profLab = document.getElementById('profLab');
+      if (profLab) profLab.value = currentUser.lab || 'Lab 1';
+    } else {
+      profAslabDetails.style.display = 'none';
+    }
+  }
+
+  // Kosongkan field kata sandi
+  const newP = document.getElementById('profNewPass');
+  if (newP) newP.value = '';
+  const confP = document.getElementById('profConfirmPass');
+  if (confP) confP.value = '';
+
+  openModal('modalProfile');
+}
+
+function saveProfileSettings() {
+  const newNama = (document.getElementById('profNama')?.value || '').trim();
+  const newContact = (document.getElementById('profContact')?.value || '').trim();
+  const newPass = (document.getElementById('profNewPass')?.value || '').trim();
+  const confirmPass = (document.getElementById('profConfirmPass')?.value || '').trim();
+
+  if (!newNama) {
+    showToast('Nama lengkap tidak boleh kosong!', 'error');
+    return;
+  }
+
+  if (newPass) {
+    if (newPass.length < 5) {
+      showToast('Kata sandi baru minimal 5 karakter!', 'error');
+      return;
+    }
+    if (newPass !== confirmPass) {
+      showToast('Konfirmasi kata sandi tidak cocok!', 'error');
+      return;
+    }
+  }
+
+  const oldNama = currentUser.nama;
+  currentUser.nama = newNama;
+  currentUser.contact = newContact;
+
+  if (currentRole === 'admin') {
+    if (db.admins) {
+      const adm = db.admins.find(a => a.username === (currentUser.username || 'admin_uir'));
+      if (adm) {
+        adm.nama = newNama;
+        if (newContact) adm.contact = newContact;
+        if (newPass) adm.password = newPass;
+      }
+    }
+  } else if (currentRole === 'aslab') {
+    const aslab = db.aslab.find(a => a.id === currentUser.id || a.username === currentUser.username);
+    if (aslab) {
+      aslab.nama = newNama;
+      aslab.contact = newContact;
+      if (newPass) aslab.password = newPass;
+
+      // Update referensi nama di jadwal, absensi, dan nilai jika nama diedit
+      if (oldNama !== newNama) {
+        db.jadwal.forEach(j => { if (j.aslab === oldNama) j.aslab = newNama; });
+        db.absensi.forEach(a => { if (a.aslab === oldNama) a.aslab = newNama; });
+        db.nilai.forEach(n => { if (n.aslab === oldNama) n.aslab = newNama; });
+      }
+    }
+  }
+
+  // Perbarui elemen UI yang menampilkan profil
+  const userNameEl = document.getElementById('userName');
+  if (userNameEl) userNameEl.textContent = newNama;
+  const userAvatarEl = document.getElementById('userAvatar');
+  if (userAvatarEl) userAvatarEl.textContent = newNama.charAt(0).toUpperCase();
+
+  saveDB();
+  saveSession(currentRole, currentUser, 'dashboard');
+  closeModal('modalProfile');
+  navigateTo('dashboard');
+  showToast('Profil pengguna berhasil diperbarui!', 'success');
+}
+
 // populate jadwal modal selects
 function populateJadwalModalSelects() {
   const jdMatkul = document.getElementById('jdMatkul');
