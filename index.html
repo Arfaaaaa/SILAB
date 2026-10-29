@@ -7,87 +7,46 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="style.css?v=3" />
 </head>
 <body class="theme-dark">
 
-<!-- ===== LOGIN LABORAN ===== -->
-<div class="auth-fullscreen-view active-view" id="view-login-admin">
+<!-- ===== LOGIN TERPADU (LABORAN / ADMIN & ASLAB) ===== -->
+<div class="auth-fullscreen-view active-view" id="view-login">
   <div class="auth-bg-overlay admin-bg-overlay"></div>
   <div class="auth-wrapper">
-    <div class="auth-glass-card admin-theme-card">
+    <div class="auth-glass-card unified-theme-card">
       <div class="auth-header">
         <div class="uir-logo-container admin-logo-glow">
           <img src="logo-uir.png" class="uir-logo-img" alt="Logo UIR" onerror="this.style.display='none'" />
         </div>
         <div class="auth-titles">
-          <span class="auth-badge-tag admin-badge">&#128737; PORTAL LABORAN &amp; ADMIN</span>
+          <span class="auth-badge-tag unified-badge">&#128272; PORTAL LOGIN SILAB</span>
           <h1 class="auth-title">UNIVERSITAS ISLAM RIAU</h1>
-          <p class="auth-sub">Sistem Informasi Laboratorium (SILAB) &mdash; Control Center Laboran</p>
+          <p class="auth-sub">Sistem Informasi Laboratorium (SILAB) &mdash; Laboran, Admin &amp; ASLAB</p>
         </div>
       </div>
-      <form class="auth-form" onsubmit="event.preventDefault(); handleAdminAuth();">
+      <form class="auth-form" id="unifiedLoginForm" onsubmit="event.preventDefault(); handleUnifiedAuth();">
         <div class="form-field">
-          <label>NIP / Username Laboran</label>
+          <label for="loginUser">Username / NIP</label>
           <div class="input-with-icon"><span class="field-icon">&#128100;</span>
-          <input type="text" id="adminUser" class="form-control auth-input" placeholder="Masukkan Username Laboran" required /></div>
+          <input type="text" id="loginUser" class="form-control auth-input" placeholder="Masukkan Username" autocomplete="username" required /></div>
         </div>
         <div class="form-field">
-          <label>Kata Sandi</label>
+          <label for="loginPass">Kata Sandi</label>
           <div class="input-with-icon"><span class="field-icon">&#128274;</span>
-          <input type="password" id="adminPass" class="form-control auth-input" placeholder="Masukkan Kata Sandi" required /></div>
+          <input type="password" id="loginPass" class="form-control auth-input" placeholder="Masukkan Kata Sandi" autocomplete="current-password" required /></div>
         </div>
-        <div class="form-field">
-          <label>PIN Otorisasi (4 Digit)</label>
+        <div class="form-field pin-field-wrap" id="loginPinWrap">
+          <label for="loginPin">PIN Otorisasi Laboran (4 Digit)</label>
           <div class="input-with-icon"><span class="field-icon">&#128273;</span>
-          <input type="text" id="adminPin" class="form-control auth-input" placeholder="Contoh: 8891" maxlength="4" required /></div>
+          <input type="password" id="loginPin" class="form-control auth-input" placeholder="Masukkan PIN Otorisasi" maxlength="4" inputmode="numeric" /></div>
+          <small class="pin-hint">&#128737; Akun Laboran/Admin terdeteksi. Masukkan PIN untuk melanjutkan.</small>
         </div>
-        <button type="submit" class="btn btn-auth-submit admin-btn-glow mt-3">
-          <span>&#128737; MASUK CONTROL CENTER LABORAN</span>
+        <button type="submit" class="btn btn-auth-submit admin-btn-glow mt-3" id="loginSubmitBtn">
+          <span id="loginSubmitText">&#128640; MASUK KE SILAB</span>
         </button>
       </form>
-      <div class="auth-footer-switch">
-        <span>Bukan Laboran / Admin?</span>
-        <button type="button" class="switch-link-btn" onclick="switchToAslabLogin()">&#127891; Login Portal ASLAB &rarr;</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== LOGIN ASLAB ===== -->
-<div class="auth-fullscreen-view" id="view-login-aslab">
-  <div class="auth-bg-overlay user-bg-overlay"></div>
-  <div class="auth-wrapper">
-    <div class="auth-glass-card user-theme-card">
-      <div class="auth-header">
-        <div class="uir-logo-container user-logo-glow">
-          <img src="logo-uir.png" class="uir-logo-img" alt="Logo UIR" onerror="this.style.display='none'" />
-        </div>
-        <div class="auth-titles">
-          <span class="auth-badge-tag user-badge">&#127891; PORTAL ASISTEN LABORATORIUM (ASLAB)</span>
-          <h1 class="auth-title">UNIVERSITAS ISLAM RIAU</h1>
-          <p class="auth-sub">Akses Jadwal, Absensi, Modul dan Nilai Akhir Saya</p>
-        </div>
-      </div>
-      <form class="auth-form" onsubmit="event.preventDefault(); handleAslabAuth();">
-        <div class="form-field">
-          <label>Username ASLAB</label>
-          <div class="input-with-icon"><span class="field-icon">&#127891;</span>
-          <input type="text" id="aslabUsername" class="form-control auth-input" placeholder="Masukkan Username ASLAB" required /></div>
-        </div>
-        <div class="form-field">
-          <label>Password</label>
-          <div class="input-with-icon"><span class="field-icon">&#128273;</span>
-          <input type="password" id="aslabPassword" class="form-control auth-input" placeholder="Masukkan Password ASLAB" required /></div>
-        </div>
-        <button type="submit" class="btn btn-auth-submit user-btn-glow mt-3">
-          <span>&#128640; MASUK PORTAL ASLAB</span>
-        </button>
-      </form>
-      <div class="auth-footer-switch">
-        <span>Laboran / Pengelola Lab?</span>
-        <button type="button" class="switch-link-btn" onclick="switchToAdminLogin()">&#128737; Switch ke Portal Laboran &rarr;</button>
-      </div>
     </div>
   </div>
 </div>
@@ -517,6 +476,6 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="modul-content.js?v=1"></script>
-<script src="app.js?v=3"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>

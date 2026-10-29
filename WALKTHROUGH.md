@@ -15,7 +15,7 @@
 ```
 Sistem-Laboratorium/
 |
-|-- index.html        <- Struktur HTML + semua modal + 2 halaman login
+|-- index.html        <- Struktur HTML + semua modal + 1 halaman login terpadu
 |-- app.js            <- Logika utama: database, auth, routing, render
 |-- style.css         <- Design system: dark theme, glassmorphism
 |-- logo-uir.png      <- Logo Universitas Islam Riau
@@ -71,11 +71,14 @@ Alur kerja:
 Buka SILAB
     |
     v
-Pilih Portal: [Admin] atau [ASLAB]
+Portal Login Terpadu (Username + Password)
+    |
+    v
+Deteksi otomatis peran akun
     |                |
     v                v
-Admin Login      ASLAB Login
-(+ PIN 8891)     (username+pass)
+Laboran/Admin    ASLAB
+(+ PIN 8891)     (langsung masuk)
     |                |
     v                v
 buildAdminSidebar()  buildAslabSidebar()
@@ -214,8 +217,8 @@ Card normal = masih ada yang belum
 
 ### Test 1: Login Admin
 1. Buka http://localhost:8000
-2. Username: admin_uir | Password: admin123 | PIN: 8891
-3. Klik MASUK CONTROL CENTER LABORAN
+2. Username: admin_uir | Password: admin123 -> klik MASUK KE SILAB
+3. Kolom PIN muncul -> isi 8891 -> klik VERIFIKASI PIN & MASUK
 4. [OK] Dashboard Admin muncul
 
 ### Test 2: Tambah Jadwal
@@ -225,8 +228,8 @@ Card normal = masih ada yang belum
 4. [OK] Jadwal muncul di tabel
 
 ### Test 3: Login ASLAB
-1. Klik "Login Portal ASLAB" di halaman login
-2. Username: andi | Password: andi123
+1. Di halaman login yang sama (portal terpadu)
+2. Username: andi | Password: andi123 -> klik MASUK KE SILAB
 3. [OK] Dashboard ASLAB hanya tampilkan data Andi
 4. [OK] Sidebar hanya ada menu ASLAB
 

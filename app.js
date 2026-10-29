@@ -305,38 +305,74 @@ function resetDataWithConfirm() {
 }
 
 // ============================================================
-// AUTH
+// AUTH (PORTAL LOGIN TERPADU)
 // ============================================================
-function handleAdminAuth() {
-  const user = document.getElementById('adminUser').value.trim();
-  const pass = document.getElementById('adminPass').value.trim();
-  const pin  = document.getElementById('adminPin').value.trim();
-  if (!user || !pass || !pin) { showToast('Semua field wajib diisi!','error'); return; }
+const ADMIN_AUTH_PIN = '8891';
 
-  // 1. Blokir akun ASLAB yang mencoba login di Portal Laboran
-  const aslabFound = db.aslab && db.aslab.find(a => a.username.toLowerCase() === user.toLowerCase());
-  if (aslabFound) {
-    showToast('Akses Ditolak! Akun "' + user + '" (' + aslabFound.nama + ') adalah Asisten Laboratorium (ASLAB), bukan Laboran. Silakan gunakan Portal Login ASLAB.', 'error');
-    return;
-  }
-
-  // 2. Validasi PIN Otorisasi Khusus Laboran
-  if (pin !== '8891') { 
-    showToast('PIN Otorisasi salah! (Gunakan 8891)', 'error'); 
-    return; 
-  }
-
-  // 3. Validasi Kredensial Resmi Laboran / Admin
-  const adminList = (db.admins && db.admins.length > 0) ? db.admins : [
+function getAdminList() {
+  return (db.admins && db.admins.length > 0) ? db.admins : [
     { username: 'admin_uir', password: 'admin123', nama: 'Laboran Utama FT', nip: '198705152010121002' }
   ];
-  const foundAdmin = adminList.find(a => a.username.toLowerCase() === user.toLowerCase() && a.password === pass);
+}
 
-  if (!foundAdmin) {
-    showToast('NIP / Username atau Kata Sandi Laboran salah!', 'error');
+function setPinStep(active) {
+  const wrap = document.getElementById('loginPinWrap');
+  const pinInput = document.getElementById('loginPin');
+  const btnText = document.getElementById('loginSubmitText');
+  if (!wrap) return;
+  wrap.classList.toggle('show', active);
+  pinInput.required = active;
+  if (active) {
+    btnText.innerHTML = '&#128737; VERIFIKASI PIN &amp; MASUK';
+    setTimeout(() => pinInput.focus(), 150);
+  } else {
+    pinInput.value = '';
+    btnText.innerHTML = '&#128640; MASUK KE SILAB';
+  }
+}
+
+function resetLoginForm() {
+  const u = document.getElementById('loginUser');
+  const p = document.getElementById('loginPass');
+  if (u) u.value = '';
+  if (p) p.value = '';
+  setPinStep(false);
+}
+
+// Satu pintu login: deteksi otomatis peran akun lalu arahkan ke dashboard yang sesuai
+function handleUnifiedAuth() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  if (!user || !pass) { showToast('Username dan kata sandi wajib diisi!', 'error'); return; }
+
+  // 1. Cek apakah akun Laboran / Admin
+  const foundAdmin = getAdminList().find(a => a.username.toLowerCase() === user.toLowerCase() && a.password === pass);
+  if (foundAdmin) {
+    const pinWrap = document.getElementById('loginPinWrap');
+    if (!pinWrap.classList.contains('show')) {
+      setPinStep(true);
+      showToast('Akun Laboran/Admin terdeteksi. Masukkan PIN Otorisasi.', 'info');
+      return;
+    }
+    const pin = document.getElementById('loginPin').value.trim();
+    if (pin !== String(foundAdmin.pin || ADMIN_AUTH_PIN)) { showToast('PIN Otorisasi salah!', 'error'); return; }
+    loginAsAdmin(foundAdmin);
     return;
   }
 
+  // 2. Cek apakah akun ASLAB
+  const foundAslab = db.aslab && db.aslab.find(a => a.username.toLowerCase() === user.toLowerCase() && a.password === pass);
+  if (foundAslab) {
+    if (foundAslab.status !== 'Aktif') { showToast('Akun ASLAB tidak aktif. Hubungi Laboran.', 'error'); return; }
+    loginAsAslab(foundAslab);
+    return;
+  }
+
+  setPinStep(false);
+  showToast('Username atau kata sandi salah!', 'error');
+}
+
+function loginAsAdmin(foundAdmin) {
   currentRole = 'admin';
   currentUser = { 
     nama: foundAdmin.nama || 'Laboran FT UIR', 
@@ -345,7 +381,8 @@ function handleAdminAuth() {
     role: 'admin' 
   };
   saveSession('admin', currentUser, 'dashboard');
-  document.getElementById('view-login-admin').classList.remove('active-view');
+  resetLoginForm();
+  document.getElementById('view-login').classList.remove('active-view');
   document.getElementById('app-dashboard-container').classList.remove('hidden');
   document.getElementById('currentRoleText').textContent = 'Laboran (Admin)';
   document.getElementById('roleDot').style.background = 'var(--emerald)';
@@ -357,28 +394,12 @@ function handleAdminAuth() {
   showToast('Selamat datang, ' + currentUser.nama + '! Control Center Laboran aktif.', 'success');
 }
 
-function handleAslabAuth() {
-  const username = document.getElementById('aslabUsername').value.trim();
-  const password = document.getElementById('aslabPassword').value.trim();
-  if (!username || !password) { showToast('Username dan password wajib diisi!','error'); return; }
-
-  // 1. Blokir akun Admin/Laboran yang mencoba login di Portal ASLAB
-  const adminList = (db.admins && db.admins.length > 0) ? db.admins : [{ username: 'admin_uir' }];
-  const isAdmin = adminList.some(adm => adm.username.toLowerCase() === username.toLowerCase());
-  if (isAdmin) {
-    showToast('Akun "' + username + '" adalah akun Laboran/Admin! Silakan gunakan Portal Login Laboran.', 'error');
-    return;
-  }
-
-  // 2. Validasi Akun ASLAB
-  const found = db.aslab.find(a => a.username.toLowerCase() === username.toLowerCase() && a.password === password);
-  if (!found) { showToast('Username atau password ASLAB salah!','error'); return; }
-  if (found.status !== 'Aktif') { showToast('Akun ASLAB tidak aktif. Hubungi Laboran.','error'); return; }
-
+function loginAsAslab(found) {
   currentRole = 'aslab';
   currentUser = found;
   saveSession('aslab', currentUser, 'dashboard');
-  document.getElementById('view-login-aslab').classList.remove('active-view');
+  resetLoginForm();
+  document.getElementById('view-login').classList.remove('active-view');
   document.getElementById('app-dashboard-container').classList.remove('hidden');
   document.getElementById('currentRoleText').textContent = 'ASLAB';
   document.getElementById('roleDot').style.background = 'var(--cyan)';
@@ -393,38 +414,18 @@ function handleAslabAuth() {
 function logoutToLoginScreen() {
   clearSession();
   document.getElementById('app-dashboard-container').classList.add('hidden');
-  if (currentRole === 'admin') {
-    document.getElementById('view-login-admin').classList.add('active-view');
-  } else {
-    document.getElementById('view-login-aslab').classList.add('active-view');
-  }
+  resetLoginForm();
+  document.getElementById('view-login').classList.add('active-view');
   currentRole = null; currentUser = null;
   showToast('Anda telah keluar dari SILAB UIR.');
 }
 
-function switchToAslabLogin() {
-  document.getElementById('view-login-admin').classList.remove('active-view');
-  document.getElementById('view-login-aslab').classList.add('active-view');
-}
-function switchToAdminLogin() {
-  document.getElementById('view-login-aslab').classList.remove('active-view');
-  document.getElementById('view-login-admin').classList.add('active-view');
-}
-
-function quickFillAslab(u, p) {
-  switchToAslabLogin();
-  document.getElementById('aslabUsername').value = u;
-  document.getElementById('aslabPassword').value = p;
-  handleAslabAuth();
-}
-
-function quickFillAdmin() {
-  switchToAdminLogin();
-  document.getElementById('adminUser').value = 'admin_uir';
-  document.getElementById('adminPass').value = 'admin123';
-  document.getElementById('adminPin').value = '8891';
-  handleAdminAuth();
-}
+// Jika username diubah setelah langkah PIN muncul, kembalikan ke langkah awal
+document.addEventListener('DOMContentLoaded', () => {
+  const u = document.getElementById('loginUser');
+  const p = document.getElementById('loginPass');
+  [u, p].forEach(el => el && el.addEventListener('input', () => setPinStep(false)));
+});
 
 // ============================================================
 // SIDEBAR BUILDER
@@ -2181,7 +2182,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Coba pulihkan sesi aktif (jika pengguna me-refresh halaman)
   const restored = restoreSession();
   if (!restored) {
-    document.getElementById('view-login-admin').classList.add('active-view');
+    document.getElementById('view-login').classList.add('active-view');
   }
 
   // Override openModal to also populate selects
